@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-labelledby="title desc">
+  <title id="title">LXP 协议架构 / LXP protocol architecture</title>
+  <desc id="desc">调用方通过 Engine 使用 Import、Work、Add、Status、Export；LXP 管 ownership，Provider 管内容。</desc>
+  <defs>
+    <style>
+      text{font-family:Inter,"Noto Sans SC",system-ui,sans-serif;fill:#172033}.title{font-size:42px;font-weight:800}.sub{font-size:19px;fill:#526078}.head{font-size:25px;font-weight:750}.body{font-size:17px}.small{font-size:14px;fill:#526078}.box{fill:#fff;stroke-width:2}.blue{stroke:#3569d4}.green{stroke:#26945d}.violet{stroke:#7357c8}.orange{stroke:#dc7b2a}.gray{stroke:#8390a5}.band{fill:#f7f9fc;stroke:#d8deea;stroke-width:2}.arrow{stroke:#3c4d68;stroke-width:3;fill:none;marker-end:url(#a)}
+    </style>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 10 5 0 10z" fill="#3c4d68"/></marker>
+  </defs>
+  <rect width="1440" height="900" fill="#fbfcfe"/>
+  <text x="720" y="64" text-anchor="middle" class="title">LXP 协议架构 / Protocol Architecture</text>
+  <text x="720" y="98" text-anchor="middle" class="sub">运行时中立的 Agent Session Context 交换层 / Runtime-neutral exchange layer</text>
+
+  <rect x="70" y="135" width="1300" height="120" rx="20" class="band"/>
+  <text x="105" y="174" class="head">调用方 / Callers</text>
+  <g class="body" text-anchor="middle">
+    <rect x="330" y="160" width="210" height="65" rx="12" class="box blue"/><text x="435" y="190">Agent Runtime</text><text x="435" y="214" class="small">任意兼容运行时</text>
+    <rect x="565" y="160" width="210" height="65" rx="12" class="box blue"/><text x="670" y="190">CLI / SDK</text><text x="670" y="214" class="small">人工或程序调用</text>
+    <rect x="800" y="160" width="210" height="65" rx="12" class="box blue"/><text x="905" y="190">CI / Worker</text><text x="905" y="214" class="small">自动化验证与交换</text>
+    <rect x="1035" y="160" width="260" height="65" rx="12" class="box blue"/><text x="1165" y="190">Product Backend</text><text x="1165" y="214" class="small">产品后端直接集成</text>
+  </g>
+
+  <path d="M720 255v55" class="arrow"/>
+  <rect x="180" y="315" width="1080" height="205" rx="22" fill="#eef4ff" stroke="#3569d4" stroke-width="3"/>
+  <text x="220" y="360" class="head">LXP Engine</text>
+  <text x="220" y="390" class="small">验证、编排、路径安全、所有权、锁与内容寻址 / validation, orchestration, path safety, ownership, locks, CAS</text>
+  <g class="body" text-anchor="middle">
+    <rect x="245" y="420" width="220" height="65" rx="12" class="box blue"/><text x="355" y="450">Init / Clone</text><text x="355" y="475" class="small">Plan / Restore / Activate</text>
+    <rect x="500" y="420" width="220" height="65" rx="12" class="box violet"/><text x="610" y="450">Work · Add · Status</text><text x="610" y="475" class="small">Route to owning Provider</text>
+    <rect x="755" y="420" width="220" height="65" rx="12" class="box green"/><text x="865" y="450">Export</text><text x="865" y="475" class="small">reference / embedded / mirrored</text>
+    <rect x="1010" y="420" width="185" height="65" rx="12" class="box orange"/><text x="1102" y="450">Requirements</text><text x="1102" y="475" class="small">Declare → Check</text>
+  </g>
+
+  <path d="M390 520v75" class="arrow"/><path d="M720 520v75" class="arrow"/><path d="M1050 520v75" class="arrow"/>
+  <g text-anchor="middle">
+    <rect x="95" y="600" width="410" height="175" rx="20" fill="#effaf4" stroke="#26945d" stroke-width="3"/>
+    <text x="300" y="640" class="head">Component Providers</text>
+    <text x="300" y="675" class="body">Git · File · Filesystem</text>
+    <text x="300" y="707" class="small">Match · Plan · Add · Status</text>
+    <text x="300" y="734" class="small">Resolve · Restore · ExportComponent</text>
+
+    <rect x="525" y="600" width="390" height="175" rx="20" fill="#f5f1ff" stroke="#7357c8" stroke-width="3"/>
+    <text x="720" y="640" class="head">Session Workdir</text>
+    <text x="720" y="675" class="body">可变工作视图 / mutable working view</text>
+    <text x="720" y="707" class="small">Roots prefix-free；内部对 Core 不透明</text>
+    <text x="720" y="734" class="small">Prefix-free roots; opaque internals</text>
+
+    <rect x="935" y="600" width="410" height="175" rx="20" fill="#fff6ed" stroke="#dc7b2a" stroke-width="3"/>
+    <text x="1140" y="640" class="head">Artifact Repository + CAS</text>
+    <text x="1140" y="675" class="body">manifest · lock · sha256 payloads</text>
+    <text x="1140" y="707" class="small">不可变 Artifact / immutable artifacts</text>
+    <text x="1140" y="734" class="small">.lxp directory · .lxpz envelope</text>
+  </g>
+  <rect x="95" y="810" width="1250" height="55" rx="12" fill="#fff" stroke="#8390a5" stroke-width="2"/>
+  <text x="720" y="844" text-anchor="middle" class="body">Provider Store 是 Provider 私有状态，不进入交换对象 / Provider Store is private and never an exchange object</text>
+</svg>

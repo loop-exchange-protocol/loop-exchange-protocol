@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LXP · Loop Exchange Protocol</title>
+  <style>
+    :root{color-scheme:light dark;--accent:#5b7cfa;--panel:color-mix(in srgb,Canvas 92%,var(--accent))}body{max-width:1080px;margin:auto;padding:3rem 1.5rem;font:16px/1.65 system-ui,sans-serif}h1{font-size:clamp(2.2rem,7vw,5rem);line-height:1;margin:.2em 0}h2{margin-top:2.5rem}.lead{font-size:1.25rem;max-width:760px}.flow,.notice,.card{background:var(--panel);border:1px solid color-mix(in srgb,CanvasText 18%,transparent);border-radius:14px;padding:1rem 1.2rem}.flow{font:600 1.1rem/1.5 ui-monospace,monospace;overflow:auto}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}.tag{color:var(--accent);font-weight:700}code{font-family:ui-monospace,monospace}img{max-width:100%;height:auto}nav a{margin-right:1rem}</style>
+</head>
+<body>
+<nav><a href="#zh">中文</a><a href="#en">English</a><a href="../docs/spec-v1alpha1.md">规范</a><a href="../docs/production-mvp.md">Production MVP</a><a href="../examples/artifact/manifest.yaml">YAML</a><a href="../examples/quickstart/README.md">Quickstart</a></nav>
+<main id="zh">
+  <p class="tag">loop.exchange/v1alpha1 · PUBLIC ALPHA</p>
+  <h1>像 Git 一样交换 Agent 上下文</h1>
+  <p class="lead">LXP 导入不可变状态，在工作区中修改与选择变更，再导出有父状态的新 Artifact。它是上下文协议，不是部署模板或命令工作流。</p>
+  <div class="flow">Init / Import → Work → Add → Status → Export → Import …</div>
+  <img src="../assets/lxp-lifecycle.svg" alt="LXP 生命周期图">
+  <h2>一条边界</h2>
+  <div class="grid"><section class="card"><h3>LXP 管 ownership</h3><p>Component roots 互不重叠；Core 负责路径、安全、Requirements、CAS 与 Artifact。</p></section><section class="card"><h3>Provider 管内容</h3><p>Component 内部不透明。<code>lxp add</code> 回到 owning Provider，不创建嵌套 Component。</p></section><section class="card"><h3>Artifact 管历史</h3><p>每次 Export 创建新 immutable identity；<code>provenance.parent</code> 连接线性历史。</p></section></div>
+  <h2>Production MVP</h2><p>官方 CLI 只装配 <code>git@v1</code>，只接受 self-contained embedded Artifact。Import 在物化或 activation 前验证 Artifact、展示内部 Provider Plan 并检查 Requirements。Config 与 payload role 由 Provider contract 定义；Artifact 不携带 Provider 可执行代码。</p>
+  <img src="../assets/lxp-architecture.svg" alt="LXP 架构图">
+  <h2>五分钟理解</h2><p>安装 <a href="https://github.com/loop-exchange-protocol/go-sdk">官方 CLI</a> 后运行 <code>LXP_BIN="$(command -v lxp)" examples/quickstart/run.sh</code>，即可看到真实的 Git discovery、Add、Export、删除来源后的 Import，以及带父 digest 的第二代 Artifact。完整交换 YAML 位于 <a href="../examples/artifact/manifest.yaml">示例 manifest</a>。</p>
+  <div class="notice"><strong>可信输入限制：</strong>v1alpha1 不承诺兼容性，只面向可信 Artifact。验证与执行策略不是恶意输入的完整安全边界。</div>
+</main>
+<main id="en" lang="en">
+  <p class="tag">ENGLISH</p><h2>Exchange agent context like Git</h2>
+  <p class="lead">LXP imports immutable state, lets a worktree change and select content, then exports a new Artifact linked to its parent. It is a context protocol, not a deployment template or command workflow.</p>
+  <div class="flow">Init / Import → Work → Add → Status → Export → Import …</div>
+  <img src="../assets/lxp-lifecycle.svg" alt="LXP lifecycle diagram">
+  <h2>One boundary</h2><p><strong>LXP tracks ownership; Providers track content.</strong> Component roots are non-overlapping and opaque. Add routes to the owning Provider. Recursive semantics belong to a composite Provider, while Core still sees one Component.</p>
+  <p>The Production MVP composes <code>git@v1</code> only and accepts self-contained embedded Artifacts only. Import validates and presents its internal Provider Plan before materialization or activation. Artifacts carry no Provider executable code.</p>
+  <p>Install the <a href="https://github.com/loop-exchange-protocol/go-sdk">official CLI</a>, then run <code>LXP_BIN="$(command -v lxp)" examples/quickstart/run.sh</code> for a black-box two-generation lifecycle and inspect the complete <a href="../examples/artifact/manifest.yaml">Artifact YAML example</a>.</p>
+  <div class="notice"><strong>Trusted-input limitation:</strong> v1alpha1 has no compatibility promise and is limited to trusted Artifacts. Validation and execution policy are not a complete hostile-input boundary.</div>
+</main>
+</body>
+</html>

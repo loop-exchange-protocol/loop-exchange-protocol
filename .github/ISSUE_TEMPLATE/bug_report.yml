@@ -1,0 +1,42 @@
+name: 缺陷报告 / Bug report
+description: 报告可复现的 LXP 缺陷 / Report a reproducible defect
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: 请勿在此报告安全漏洞，请遵循 SECURITY.md。Do not report security vulnerabilities here; follow SECURITY.en.md.
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述 / Description
+      description: 实际发生了什么？预期是什么？What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 最小复现 / Reproduction
+      description: 提供已移除秘密的最小命令、输入和 Artifact。Provide minimal inputs with secrets removed.
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: LXP 版本 / Revision
+      placeholder: Commit hash 或版本 / version
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境 / Environment
+      description: OS、架构、实现/CLI 版本和相关 Provider contract 版本。 / OS, architecture, implementation/CLI version, and relevant Provider contract versions.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志或诊断 / Logs or diagnostics
+      description: 确认不含 credential 或 secret 后粘贴相关输出。Paste output only after checking for secrets.
+      render: shell

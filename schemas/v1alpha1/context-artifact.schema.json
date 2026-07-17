@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loop.exchange/schemas/v1alpha1/context-artifact.schema.json",
+  "title": "Loop Exchange ContextArtifact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "coordinates", "provenance"],
+  "properties": {
+    "api_version": { "const": "loop.exchange/v1alpha1" },
+    "kind": { "const": "ContextArtifact" },
+    "coordinates": { "$ref": "#/$defs/coordinates" },
+    "components": { "type": "array", "items": { "$ref": "#/$defs/component" } },
+    "requirements": { "type": "array", "items": { "$ref": "#/$defs/requirement" } },
+    "provenance": { "$ref": "#/$defs/provenance" }
+  },
+  "$defs": {
+    "identifier": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "coordinates": {
+      "type": "object", "additionalProperties": false,
+      "required": ["namespace", "name", "version"],
+      "properties": {
+        "namespace": { "$ref": "#/$defs/identifier" },
+        "name": { "$ref": "#/$defs/identifier" },
+        "version": { "$ref": "#/$defs/identifier" },
+        "variant": { "$ref": "#/$defs/identifier" }
+      }
+    },
+    "payload": {
+      "type": "object", "additionalProperties": false,
+      "required": ["media_type", "digest", "size"],
+      "properties": {
+        "media_type": { "type": "string", "minLength": 1 },
+        "digest": { "$ref": "#/$defs/digest" },
+        "size": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "componentSource": {
+      "type": "object", "additionalProperties": false,
+      "required": ["locator", "revision"],
+      "properties": {
+        "locator": { "type": "string" },
+        "revision": { "type": "string", "pattern": "^(?:[0-9a-fA-F]{40,64}|sha256:[0-9a-f]{64})$" },
+        "subdir": { "type": "string" }
+      }
+    },
+    "reference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["locator", "revision"],
+      "properties": {
+        "locator": { "type": "string", "minLength": 1 },
+        "revision": { "type": "string", "minLength": 1 },
+        "subdir": { "type": "string" }
+      }
+    },
+    "embedded": {
+      "type": "object", "additionalProperties": false,
+      "required": ["payloads"],
+      "properties": {
+        "revision": { "type": "string" },
+        "payloads": { "type": "object", "minProperties": 1, "additionalProperties": { "$ref": "#/$defs/payload" } }
+      }
+    },
+    "component": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "path", "provider", "contract", "distribution"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "description": { "type": "string", "maxLength": 2048 },
+        "path": { "$ref": "#/$defs/path" },
+        "provider": { "$ref": "#/$defs/identifier" },
+        "contract": { "$ref": "#/$defs/identifier" },
+        "config": { "type": "object" },
+        "distribution": { "enum": ["reference", "embedded", "mirrored"] },
+        "requires": { "type": "array", "items": { "$ref": "#/$defs/identifier" }, "uniqueItems": true },
+        "reference": { "$ref": "#/$defs/reference" },
+        "embedded": { "$ref": "#/$defs/embedded" },
+        "metadata": { "type": "object", "additionalProperties": { "type": "string" } }
+      },
+      "allOf": [
+        { "if": { "properties": { "distribution": { "const": "reference" } } }, "then": { "required": ["reference"], "not": { "required": ["embedded"] } } },
+        { "if": { "properties": { "distribution": { "const": "embedded" } } }, "then": { "required": ["embedded"], "not": { "required": ["reference"] } } },
+        { "if": { "properties": { "distribution": { "const": "mirrored" } } }, "then": { "required": ["reference", "embedded"] } }
+      ]
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^(?!\\.\\.?$)(?!/)(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.(?:/|$))(?!\\.(?:loop|lxp)(?:/|$))(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\/$).+$"
+    },
+    "requirement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "check"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "description": { "type": "string", "maxLength": 2048 },
+        "prompt": { "type": "string", "maxLength": 8192 },
+        "provided_by": { "type": "string", "pattern": "^(?:environment|component:[A-Za-z0-9][A-Za-z0-9._-]{0,127})$" },
+        "check": { "$ref": "#/$defs/check" }
+      }
+    },
+    "check": {
+      "oneOf": [
+        { "$ref": "#/$defs/executableCheck" },
+        { "$ref": "#/$defs/mcpCheck" },
+        { "$ref": "#/$defs/credentialCheck" }
+      ]
+    },
+    "executableCheck": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "command"],
+      "properties": {
+        "type": { "const": "executable" },
+        "command": { "type": "string", "pattern": "^[^/\\\\]+$" },
+        "args": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "mcpCheck": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "command"],
+      "properties": {
+        "type": { "const": "mcp" },
+        "command": { "type": "string", "pattern": "^[^/\\\\]+$" },
+        "args": { "type": "array", "items": { "type": "string" } },
+        "required_tools": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      }
+    },
+    "credentialCheck": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "accepts"],
+      "properties": {
+        "type": { "const": "credential" },
+        "accepts": { "type": "array", "items": { "enum": ["ssh-agent", "environment", "bearer-token"] }, "minItems": 1, "uniqueItems": true }
+      }
+    },
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["created_at", "engine"],
+      "properties": {
+        "created_at": { "type": "string", "format": "date-time" },
+        "engine": { "type": "string" },
+        "parent": { "$ref": "#/$defs/digest" }
+      }
+    }
+  }
+}
