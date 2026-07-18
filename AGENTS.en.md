@@ -27,4 +27,4 @@ make ci
 
 `v1alpha1` is a public alpha with no compatibility promise and is limited to trusted Artifacts. Validation, digest verification, and execution policy are not a complete security boundary for hostile input.
 
-The Production MVP is a constrained specification subset: the official composition includes `git@v1` only, the public CLI is limited to `init/add/status/export/import/inspect/requirements`, and it accepts embedded `.lxpz` Artifacts only. `Plan` is internal Import preflight; File/Filesystem Providers, reference/mirrored distribution, and Template repositories are outside the production claim.
+The Production MVP is a constrained specification subset: the official composition includes `git@v1` only, the public CLI is limited to `init/add/status/export/import/inspect/requirements`, and it accepts `reference`, `embedded`, and `mirrored` `.lxpz` Artifacts. `lxp export --distribution` selects the form and defaults to `embedded`; Import follows the Artifact declaration. `Plan` is internal Import preflight; File/Filesystem Providers and Template repositories are outside the production claim.

@@ -2,7 +2,7 @@
 
 **English** | [中文主版本](spec-v1alpha1.md)
 
-Status: public alpha with no forward or backward compatibility promise. `MUST`, `MUST NOT`, `SHOULD`, and `MAY` follow RFC 2119. The first deployable subset is the [Production MVP Profile](production-mvp.en.md): trusted environments, official `git@v1`, and embedded-only exchange.
+Status: public alpha with no forward or backward compatibility promise. `MUST`, `MUST NOT`, `SHOULD`, and `MAY` follow RFC 2119. The first deployable subset is the [Production MVP Profile](production-mvp.en.md): trusted environments, official `git@v1`, and reference/embedded/mirrored `.lxpz` exchange.
 
 ## 1. Goal and lifecycle
 
@@ -99,7 +99,7 @@ Each Component records `reference`, `embedded`, or `mirrored` distribution. Refe
 
 A reference locator MUST be a portable identity declared by its Provider contract and cannot contain secrets, local materialization paths, or Provider Store paths. Reference availability depends on its external source, so an unavailable source fails reference Import. A mirrored fallback MUST represent the same Provider-selected state, but MAY explicitly exclude objects that its contract declares as external Requirements.
 
-Unsupported distributions MUST fail. A standalone Artifact embeds all consumed content and imports after deleting the exporter Engine state and original sources. The Production MVP permits embedded only; reference and mirrored are defined experimental capabilities outside production conformance. See the [Distribution guide](distributions.en.md) for structure and selection rules.
+Unsupported distributions MUST fail. A standalone Artifact embeds all consumed content and imports after deleting the exporter Engine state and original sources; a mirrored fallback satisfies this condition, while reference explicitly depends on its external source. The Production MVP public CLI MUST support all three distributions and defaults Export to embedded. See the [Distribution guide](distributions.en.md) for structure and selection rules.
 
 ## 7. Requirements and activation
 

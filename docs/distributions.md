@@ -2,7 +2,7 @@
 
 [English](distributions.en.md) | **中文主版本**
 
-本文解释 `reference`、`embedded` 与 `mirrored` 的选择和当前 `git@v1` alpha 行为。规范性规则仍以 [v1alpha1 规范](spec-v1alpha1.md)和 [Schema](../schemas/v1alpha1/context-artifact.schema.json)为准。
+本文解释 `reference`、`embedded` 与 `mirrored` 的选择和当前 `git@v1` Production MVP 行为。规范性规则仍以 [v1alpha1 规范](spec-v1alpha1.md)和 [Schema](../schemas/v1alpha1/context-artifact.schema.json)为准。
 
 ## 三种分发方式
 
@@ -16,9 +16,9 @@
 
 对应的完整 YAML 结构见 [`examples/distributions/`](../examples/distributions/README.md)。YAML 是交换格式；用户不需要日常手写这些字段。
 
-## `git@v1` alpha 规则
+## `git@v1` 规则
 
-当前 Go Git Provider 的实验模式遵循：
+当前 Go Git Provider 遵循：
 
 - locator 只接受无内联凭据的 `https://`、`ssh://`、`git://` 或 SCP-like SSH Git URL；本地 absolute path、`file://`、query secret 与合成 locator 被拒绝；
 - revision 必须是完整 40/64 位 Git object ID，并在 Export 时可从 remote advertised ref 到达；
@@ -27,7 +27,7 @@
 - reference Import 保留安全 origin；mirrored fallback 恢复后也保留同一 origin identity；
 - partial/shallow repository、submodule/gitlink、escaping symlink 与未声明 filter 失败。
 
-Spring AI 使用 Git LFS。实验 Component 可以声明：
+Spring AI 使用 Git LFS。Reference/mirrored Component 可以声明：
 
 ```yaml
 config:
@@ -36,8 +36,15 @@ config:
 
 此模式只把 Git tree 中的 LFS pointer blob 视为 Component state，并在 checkout 时禁用 LFS filter。外部 LFS object 不进入 mirrored payload，也不会被 Import 执行或下载。Production embedded 仍拒绝全部 clean/smudge filter。
 
-## Profile 与 Harness
+## CLI 与 Harness
 
-官方 Production CLI 仍只接受 embedded `.lxpz`；它没有 reference/mirrored flag。实验能力通过 Go Engine/Provider API 暴露，不修改冻结的公开命令面。
+公开 CLI 端到端支持三种形式：
 
-[`go-provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp) 使用四个真实 Git Component，验证 reference 在线恢复、reference 离线失败/清理与 mirrored 离线 fallback。`v1alpha1` 不承诺兼容性，并且只面向可信 Artifact、locator 与本地 Provider。
+```bash
+lxp export --distribution reference context.lxpz
+lxp export --distribution embedded context.lxpz   # 默认
+lxp export --distribution mirrored context.lxpz
+lxp import context.lxpz continued                 # 自动读取 distribution
+```
+
+[`go-provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp) 直接使用公开 `lxp` CLI 和四个真实 Git Component，验证 reference 在线恢复、reference 离线失败/清理与 mirrored 离线 fallback。`v1alpha1` 不承诺兼容性，并且只面向可信 Artifact、locator 与本地 Provider。

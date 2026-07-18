@@ -27,4 +27,4 @@ make ci
 
 `v1alpha1` 是不承诺兼容性的 public alpha，只面向可信 Artifact。Validation、digest verification 与 execution policy 不是处理恶意输入的完整安全边界。
 
-Production MVP 是规范的受限子集：官方组合只包含 `git@v1`，公开 CLI 只有 `init/add/status/export/import/inspect/requirements`，并且只接受 `.lxpz` embedded Artifact。`Plan` 仅是 Import 内部 preflight；File/Filesystem Provider、reference/mirrored distribution 与 Template repository 不属于生产承诺。
+Production MVP 是规范的受限子集：官方组合只包含 `git@v1`，公开 CLI 只有 `init/add/status/export/import/inspect/requirements`，接受 `.lxpz` 的 `reference`、`embedded` 与 `mirrored`。`lxp export --distribution` 选择分发形式，默认 `embedded`；Import 按 Artifact 自动处理。`Plan` 仅是 Import 内部 preflight；File/Filesystem Provider 与 Template repository 不属于生产承诺。

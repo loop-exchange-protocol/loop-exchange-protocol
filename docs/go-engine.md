@@ -12,7 +12,7 @@ cd work
 # 修改后选择需要交换的 Git 状态
 lxp add source/PATH...
 lxp status
-lxp export ../context.lxpz
+lxp export --distribution mirrored ../context.lxpz
 
 cd ..
 lxp inspect context.lxpz
@@ -28,15 +28,15 @@ lxp import context.lxpz continued
 
 ## Export 与 Import
 
-Production Export 只生成 embedded Artifact：当前 `HEAD` 的最小 Git bundle 加可选 staged binary patch。Import 不联系原 remote，恢复后 selection 仍位于 Git index。成功 Export 推进 Session parent，下一代 Artifact 自动写入 `provenance.parent`。
+`lxp export --distribution` 支持 `reference`、`embedded` 与 `mirrored`，省略时默认 embedded。`lxp import` 不需要 distribution flag，直接按 Artifact manifest 自动处理。成功 Export 推进 Session parent，下一代 Artifact 自动写入 `provenance.parent`。
 
-为保证 standalone 语义，Git Provider 拒绝 shallow repository、submodule/gitlink、escaping symlink 和 clean/smudge filter（包括 Git LFS）。Artifact output 不覆盖现有路径；Import target 必须不存在，失败时清理新 target。
+Embedded 使用当前 `HEAD` 的最小 Git bundle 加可选 staged binary patch，Import 不联系原 remote，并恢复 Git index selection。Reference 使用安全 network locator + 完整 commit ID。Mirrored 先尝试相同 revision 的 reference，source 不可用时清理部分 target，再从 embedded base 恢复。Reference/mirrored 要求 index 与 `HEAD` 一致，不能运输 staged patch。
 
-## 实验 Distribution API
+为保证 portable 语义，Git Provider 拒绝 shallow repository、submodule/gitlink 与 escaping symlink；embedded 还拒绝 clean/smudge filter。Reference/mirrored 的 LFS pointer 模式不执行 filter，外部 LFS object 不进入 Artifact。Artifact output 不覆盖现有路径；Import target 必须不存在，失败时清理新 target。
 
-Go Engine 与 `git@v1` Provider API 额外实现 reference/mirrored，但官方 Production CLI 不提供对应 flag，也不接受这两种 Artifact。Reference 使用安全 network locator + 完整 commit ID；mirrored 在 reference 不可用时回退到相同 revision 的 embedded base。两种模式都要求 index 与 `HEAD` 一致，不能运输 staged patch。
+## Distribution 选择
 
-完整规则和 YAML 见 [Distribution 指南](distributions.md)；四个真实仓库的可执行验证位于 [`go-provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp)。
+日常 checkpoint 可直接使用默认 embedded；大型公开 repository 可选 reference；既要保留 remote identity 又要容忍 source outage 时选择 mirrored。完整规则和 YAML 见 [Distribution 指南](distributions.md)；公开 CLI 的四个真实仓库验证位于 [`go-provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp)。
 
 ## Requirements 与信任边界
 

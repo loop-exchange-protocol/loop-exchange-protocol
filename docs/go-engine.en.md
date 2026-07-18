@@ -12,7 +12,7 @@ cd work
 # Select the Git state to exchange after making changes.
 lxp add source/PATH...
 lxp status
-lxp export ../context.lxpz
+lxp export --distribution mirrored ../context.lxpz
 
 cd ..
 lxp inspect context.lxpz
@@ -28,15 +28,15 @@ Status shows Component roots, Git porcelain changes, unowned paths, and ignored 
 
 ## Export and Import
 
-Production Export creates embedded Artifacts only: a minimal Git bundle for the current `HEAD` plus an optional staged binary patch. Import never contacts the original remote and restores the selection into the Git index. A successful Export advances the Session parent, so the next Artifact records `provenance.parent` automatically.
+`lxp export --distribution` supports `reference`, `embedded`, and `mirrored`, defaulting to embedded when omitted. `lxp import` needs no distribution flag and follows the Artifact manifest automatically. A successful Export advances the Session parent, so the next Artifact records `provenance.parent` automatically.
 
-To preserve standalone semantics, the Git Provider rejects shallow repositories, submodules/gitlinks, escaping symlinks, and clean/smudge filters including Git LFS. Artifact output never overwrites an existing path; an Import target must not exist and a failed Import removes the new target.
+Embedded uses a minimal Git bundle for the current `HEAD` plus an optional staged binary patch; Import does not contact the original remote and restores Git index selection. Reference uses a safe network locator plus full commit ID. Mirrored tries the same-revision reference first, cleans any partial target when its source is unavailable, and restores the embedded base. Reference and mirrored require an index matching `HEAD` and cannot transport a staged patch.
 
-## Experimental Distribution API
+For portable behavior, the Git Provider rejects shallow repositories, submodules/gitlinks, and escaping symlinks; embedded also rejects clean/smudge filters. Reference/mirrored LFS pointer mode never executes filters, and external LFS objects do not enter the Artifact. Artifact output never overwrites an existing path; an Import target must not exist and a failed Import removes the new target.
 
-The Go Engine and `git@v1` Provider APIs additionally implement reference and mirrored, while the official Production CLI exposes no matching flag and rejects both Artifact forms. Reference uses a safe network locator plus full commit ID. Mirrored falls back to an embedded base at the same revision when its reference is unavailable. Both modes require an index matching `HEAD` and cannot transport a staged patch.
+## Choosing a distribution
 
-See the [Distribution guide](distributions.en.md) for complete rules and YAML, and the [`go-provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp) for executable validation with four real repositories.
+Use the embedded default for ordinary checkpoints, reference for large public repositories, and mirrored when remote identity and source-outage recovery both matter. See the [Distribution guide](distributions.en.md) for complete rules and YAML, and the [`go-provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp) for public-CLI validation with four real repositories.
 
 ## Requirements and trust boundary
 

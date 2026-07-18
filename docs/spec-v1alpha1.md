@@ -2,7 +2,7 @@
 
 [English](spec-v1alpha1.en.md) | **中文主版本**
 
-状态：public alpha；不承诺向前或向后兼容。`MUST`、`MUST NOT`、`SHOULD`、`MAY` 按 RFC 2119 解释。首个可部署子集由 [Production MVP Profile](production-mvp.md) 定义：可信环境、官方 `git@v1`、embedded-only。
+状态：public alpha；不承诺向前或向后兼容。`MUST`、`MUST NOT`、`SHOULD`、`MAY` 按 RFC 2119 解释。首个可部署子集由 [Production MVP Profile](production-mvp.md) 定义：可信环境、官方 `git@v1`、`.lxpz` 的 reference/embedded/mirrored。
 
 ## 1. 目标与生命周期
 
@@ -112,7 +112,7 @@ Export MUST 读取 Provider 选择的当前状态。Git Provider 的 Add/Status 
 
 Reference locator MUST 是 Provider contract 声明的 portable identity，不得包含 secret、本地物化路径或 Provider Store path。Reference 的可用性依赖外部 source；无法访问时 reference Import 失败。Mirrored fallback MUST 表示与 reference 相同的 Provider-selected state，但 MAY 明确排除 contract 声明为外部 Requirement 的对象。
 
-不支持的 distribution MUST 失败。Standalone Artifact 的所有消费内容必须 embedded，并能在 exporter Engine state 与原始 source 删除后 Import。Production MVP 只允许 embedded；reference 与 mirrored 是已定义但仍在生产 conformance 之外的实验性 capability。结构和选择规则见 [Distribution 指南](distributions.md)。
+不支持的 distribution MUST 失败。Standalone Artifact 的所有消费内容必须 embedded，并能在 exporter Engine state 与原始 source 删除后 Import；mirrored 的 fallback 满足该条件，reference 明确依赖外部 source。Production MVP 的公开 CLI MUST 支持三种 distribution，并在 Export 时默认 embedded。结构和选择规则见 [Distribution 指南](distributions.md)。
 
 ## 7. Requirements 与 activation
 

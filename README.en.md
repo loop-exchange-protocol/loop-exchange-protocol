@@ -35,9 +35,9 @@ The analogy stops at usage. The protocol permits different Provider types; the f
 5. Recursive or composite semantics belong in one composite Provider; Core still sees one Component.
 6. Artifacts never carry executable Provider code. Import requires a preinstalled, trusted matching Provider contract and otherwise fails.
 7. Providers may materialize with symlinks, Git worktrees, copies, reflinks, or mounts. The protocol standardizes the result, not the mechanism.
-8. The Production MVP composes `git@v1` only and exports embedded Artifacts only; no matching Provider means failure.
+8. The Production MVP composes `git@v1` only, but fully supports reference, embedded, and mirrored `.lxpz` Artifacts; no matching Provider means failure.
 
-The general wire model also defines reference and mirrored. The current Go Engine/Provider API implements them experimentally without changing the Production CLI's embedded-only surface or conformance boundary; see the [Distribution guide](docs/distributions.en.md).
+The public CLI selects a form with `lxp export --distribution reference|embedded|mirrored` (default: embedded), and Import follows the Artifact declaration automatically. See the [Distribution guide](docs/distributions.en.md).
 
 ## Quick start
 

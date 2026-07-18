@@ -2,7 +2,7 @@
 
 **English** | [中文主版本](distributions.md)
 
-This guide explains how to choose `reference`, `embedded`, or `mirrored`, plus the current `git@v1` alpha behavior. The [v1alpha1 specification](spec-v1alpha1.en.md) and [Schema](../schemas/v1alpha1/context-artifact.schema.json) remain normative.
+This guide explains how to choose `reference`, `embedded`, or `mirrored`, plus the current `git@v1` Production MVP behavior. The [v1alpha1 specification](spec-v1alpha1.en.md) and [Schema](../schemas/v1alpha1/context-artifact.schema.json) remain normative.
 
 ## Three distribution forms
 
@@ -16,9 +16,9 @@ Mirrored does not contain two different versions. Its reference and embedded rev
 
 See [`examples/distributions/`](../examples/distributions/README.en.md) for complete YAML structures. YAML is the exchange format; users are not expected to author these fields in daily work.
 
-## `git@v1` alpha rules
+## `git@v1` rules
 
-The experimental modes in the current Go Git Provider follow these rules:
+The current Go Git Provider follows these rules:
 
 - locators accept credential-free `https://`, `ssh://`, `git://`, or SCP-like SSH Git URLs; absolute local paths, `file://`, query secrets, and synthetic locators fail;
 - a revision is a full 40- or 64-character Git object ID reachable at Export from a remote advertised ref;
@@ -27,7 +27,7 @@ The experimental modes in the current Go Git Provider follow these rules:
 - reference Import retains its safe origin, and mirrored fallback retains the same origin identity;
 - partial/shallow repositories, submodules/gitlinks, escaping symlinks, and undeclared filters fail.
 
-Spring AI uses Git LFS. An experimental Component can declare:
+Spring AI uses Git LFS. A reference or mirrored Component can declare:
 
 ```yaml
 config:
@@ -36,8 +36,15 @@ config:
 
 This mode treats only the LFS pointer blob tracked in the Git tree as Component state and disables LFS filters during checkout. External LFS objects do not enter the mirrored payload and Import neither executes nor downloads them. Production embedded continues to reject every clean/smudge filter.
 
-## Profile and Harness
+## CLI and Harness
 
-The official Production CLI still accepts embedded `.lxpz` only and has no reference or mirrored flag. Experimental support is exposed through the Go Engine/Provider API without changing the frozen public command surface.
+The public CLI supports all three forms end to end:
 
-The [`go-provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp) uses four real Git Components to verify online reference restore, offline reference failure/cleanup, and offline mirrored fallback. `v1alpha1` carries no compatibility promise and is limited to trusted Artifacts, locators, and locally installed Providers.
+```bash
+lxp export --distribution reference context.lxpz
+lxp export --distribution embedded context.lxpz   # default
+lxp export --distribution mirrored context.lxpz
+lxp import context.lxpz continued                 # reads distribution automatically
+```
+
+The [`go-provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp) directly uses the public `lxp` CLI and four real Git Components to verify online reference restore, offline reference failure/cleanup, and offline mirrored fallback. `v1alpha1` carries no compatibility promise and is limited to trusted Artifacts, locators, and locally installed Providers.
