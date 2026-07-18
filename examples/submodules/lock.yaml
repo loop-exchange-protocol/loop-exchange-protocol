@@ -1,0 +1,19 @@
+api_version: loop.exchange/v1alpha1
+artifact: sha256:6d253a5b3fe4a687d3513982462a4e661f2f3912e7915aa5f8ae2f906c27aaed
+components:
+  - id: application
+    path: repositories/application
+    provider: git
+    contract: v1
+    distribution: mirrored
+    revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    embedded:
+      base: sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  - id: shared-library
+    path: repositories/application/deps/shared-library
+    provider: git
+    contract: v1
+    distribution: embedded
+    revision: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+    embedded:
+      base: sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd

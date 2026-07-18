@@ -15,14 +15,15 @@ make ci
 ## 不变量
 
 - 生命周期为 `Import → Work → Add/Status → Export`；每次 Export 创建新的不可变 Artifact。
-- LXP 管 ownership，Provider 管内容；Component roots 必须 prefix-free，且内部对 Core 不透明。
-- Component 内的 `lxp add` 必须路由到 owning Provider，不得创建嵌套 Component。
+- LXP 管 ownership，Provider 管内容；Component roots 唯一且可形成严格嵌套 lexical tree，实体 path 只归最深 root。
+- `lxp add` 路由到最深 owning Provider；native discovery 可注册嵌套 Component，祖先 Provider 必须排除 child subtree，无法安全组合时失败。
 - Provider 由稳定 `provider + contract` 标识；Provider-specific config/payload 对 Core 不透明。
 - Artifact 不携带 Provider 可执行代码；未知或不匹配的 contract 必须失败。
 - 交换对象只包含逻辑身份与 SHA-256 payload，不包含本地物化路径或 Provider Store path。
 - Standalone embedded Artifact import 不依赖原始 source 或 exporter Engine state。
 - Secret 值不得进入 manifest、lock、payload、argv 或 log；Executable/MCP action 必须显式授权。
 - 未归属且未忽略的 path 会阻止 Export；Git-untracked 内容不得静默导出。
+- `git@v1` 把已初始化 submodule 注册为独立嵌套 Component；Export 子到父验证 gitlink/revision，Import 父到子恢复且拒绝 symlink/non-empty collision。
 - Conversation 可以 continue，但不支持 execution replay。
 
 `v1alpha1` 是不承诺兼容性的 public alpha，只面向可信 Artifact。Validation、digest verification 与 execution policy 不是处理恶意输入的完整安全边界。

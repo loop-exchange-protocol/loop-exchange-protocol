@@ -33,7 +33,7 @@ lxp requirements [--format tui|json] ARTIFACT.lxpz
 - The official composition contains `git@v1` only; there is no implicit File/Filesystem fallback.
 - The current `git@v1` implementation requires a preinstalled, trusted Git CLI. This is a Provider installation prerequisite, not an executable carried by the Artifact.
 - `lxp add` and Export fail when an unowned path has no matching Provider.
-- One Git repository is one opaque Component root; Core creates no nested Component inside it.
+- Each Git repository is an independent Component. Every initialized Git submodule is recursively registered as a nested `git@v1` Component. The parent owns `.gitmodules` and the gitlink boundary; the child owns its worktree entities.
 - Conversations, Skills, results, and other context enter an MVP Artifact only when stored in a Git-managed repository and selected through the Git index.
 - The protocol retains third-party Provider extension points, but they are outside this Profile's production claim.
 
@@ -48,7 +48,9 @@ lxp requirements [--format tui|json] ARTIFACT.lxpz
 - Artifact identity is the SHA-256 of the exact `manifest.yaml` bytes; coordinates are human-readable labels, not identity.
 - Every successful Export advances the current Session parent digest; the next manifest references it.
 
-`git@v1` Production Export rejects shallow repositories, submodules/gitlinks, and escaping symlinks. Embedded rejects clean/smudge filters. Reference and mirrored may declare `lfs_mode: pointer`, exchange only canonical LFS pointers tracked in the Git tree, never execute filters, and do not promise external LFS objects.
+`git@v1` Production Export rejects shallow repositories, uninitialized or unregistered submodules, gitlink/child-revision mismatch, nested roots crossing symlinks, and escaping symlinks. Every submodule is exchanged as an independent Component with its own distribution; a parent Git bundle never carries child repository objects. Embedded rejects clean/smudge filters. Reference and mirrored may declare `lfs_mode: pointer`, exchange only canonical LFS pointers tracked in the Git tree, never execute filters, and do not promise external LFS objects.
+
+Import restores parent before child: a parent checkout may leave only an absent or empty-directory child target; a non-empty, file, or symlink collision fails. Export runs child before parent, and the parent Provider MUST verify that its selected gitlink equals the child Component's locked revision. `lxp add` registers initialized submodules; paths inside a child select its index, while selecting the child root synchronizes the parent gitlink. Recursive submodules repeat the same rules.
 
 ## Failure and persistence guarantees
 
@@ -61,7 +63,7 @@ lxp requirements [--format tui|json] ARTIFACT.lxpz
 
 ## Explicit non-goals
 
-This Profile provides no remote Registry, coordinate install/resolve, Template-repository import, branch/merge/rebase, multi-parent history, multi-writer Sessions, submodule recursion, external Git LFS object exchange, automatic Provider installation, execution replay, or hostile-Artifact sandbox.
+This Profile provides no remote Registry, coordinate install/resolve, Template-repository import, branch/merge/rebase, multi-parent history, multi-writer Sessions, automatic initialization or update of missing submodules, external Git LFS object exchange, automatic Provider installation, execution replay, or hostile-Artifact sandbox.
 
 ## Release gate
 
@@ -70,5 +72,5 @@ Before claiming the Production MVP, an implementation passes:
 1. Go unit, race, and vet checks;
 2. positive and negative Git Provider contract tests;
 3. online/offline reference and mirrored-fallback Harnesses, plus a two-generation embedded Export/Import Harness after deleting exporter/source state;
-4. digest, size, traversal, duplicate-entry, symlink, submodule, filter, and contract-mismatch tests;
+4. digest, size, traversal, duplicate-entry, symlink, nested-collision, unregistered-submodule, gitlink-revision-mismatch, filter, and contract-mismatch tests;
 5. consistency checks across bilingual specifications, Schemas, canonical YAML, HTML, and CLI help.

@@ -58,28 +58,31 @@ components:
 Normative invariants:
 
 - Component paths MUST be safe normalized relative paths outside local-only `.loop` and `.lxp`.
-- Component roots MUST be prefix-free: no root equals, contains, or is contained by another.
+- Component roots MUST be unique. Roots MAY be strictly nested by normalized lexical path and therefore form an unambiguous ownership tree; symlink aliases cannot bypass that tree.
 - Engine owns roots, identities, Provider routing, Requirements, and the exchange envelope.
-- A Component root MUST be opaque to Core. Core MUST NOT recursively interpret internal markers or create nested Components.
-- Operations on a path inside a Component MUST route back to its owning Provider.
-- Recursive or nested semantics MAY be implemented by one composite Provider owning the entire root; its children are not Core Components.
+- Except for declared direct child roots, a Component remains opaque to Core. Every entity path is owned by its deepest containing Component root. An ancestor Provider MUST exclude every direct child subtree and MUST fail when it cannot do so safely.
+- Core MUST NOT standardize symlink, copy, mount, or Provider-pair compatibility, and local materialization capabilities MUST NOT enter the Artifact. Local Providers decide whether a parent and child can be composed physically and fail closed when they cannot.
+- During Add, Core MAY invoke native child discovery on the owning Provider. A discovered child is registered as an independent Component; Core cannot guess unknown markers.
+- Ordinary path operations route to the deepest owning Provider. A parent Provider may additionally maintain Provider-native attachment metadata such as a gitlink at the boundary, but cannot read or export child entity content.
 
 ## 4. Provider contract
 
 Provider identity consists of a stable `provider` ID and `contract` version. Provider-specific `config` is opaque: Core MUST transport it faithfully and MUST NOT interpret its fields. Payload roles are likewise contract-defined.
 
-A Provider contract contains `Match`, `Resolve`, `Materialize`, `Restore`, `Plan`, `Add`, `Status`, `Activate`, and `ExportComponent`. Plan exposes Requirements, actions, and security effects before execution. Add and Status implement native change-selection semantics.
+A Provider contract contains `Match`, `Resolve`, `Materialize`, `Restore`, `Plan`, `Add`, `Status`, `Activate`, and `ExportComponent`. It MAY implement `DiscoverChildren` for initialized Provider-native direct child roots and `TrackChild` for parent boundary metadata after child selection. Plan exposes Requirements, actions, and security effects before execution. Add and Status implement native change-selection semantics.
 
 Artifacts MUST NOT carry Provider executables, plugin binaries, or install hooks. Import MUST use a preinstalled, trusted, exactly matching contract and otherwise fail. Silent downgrade and Agent-inferred migration are forbidden.
 
 Providers MAY materialize using symlinks, Git worktrees, copies, reflinks, mounts, or another local mechanism. LXP standardizes the semantic result at the declared path, not the mechanism. Local target paths, sockets, PIDs, ports, credential handles, and Provider Store paths MUST NOT enter an Artifact.
 
+Core supplies a parent Provider with the relative roots and portable identities of its direct children. This runtime context exists only to exclude child subtrees or validate Provider-native attachments; it is not an Artifact mount-capability DSL. A Provider that cannot compose a concrete path safely MUST fail during Plan, Import, or Export.
+
 ## 5. Add and discovery
 
 `lxp add PATH...` follows ownership routing:
 
-1. Inside an existing Component, invoke its Provider's `Add`; never register a child Component.
-2. At an unowned root, invoke trusted Providers' `Match`, register the unique match, then invoke `Add`.
+1. Inside the deepest existing Component, first invoke its Provider's native child discovery. If no deeper root matches, invoke that Component Provider's `Add`.
+2. At an unowned root, or at a deeper root returned by discovery, invoke trusted Providers' `Match`, register the unique match, then invoke `Add`.
 3. With no match, fail; Core never guesses or implicitly installs a fallback Provider.
 4. Multiple matches fail and require explicit selection.
 
@@ -115,9 +118,9 @@ A Conversation is exchanged as ordinary Component content; the Production MVP st
 
 ## 9. Import and export
 
-Import MUST safely unpack, validate schema/lock/digests, verify prefix-free paths, locate exact Provider contracts, present internal Provider Plans and Requirements before any materialization or activation side effect, apply local policy, restore/materialize, activate in dependency order, write local locks, and expose the Workdir. Plan is an Import preflight contract, not a required standalone CLI. Unknown Providers, contract mismatch, digest failure, unmet consumed Requirements, and activation failure terminate Import.
+Import MUST safely unpack, validate schema/lock/digests, verify that roots are unique and form a safe lexical tree, locate exact Provider contracts, present internal Provider Plans and Requirements before any materialization or activation side effect, apply local policy, restore/materialize from parent to child, reject symlink traversal and non-empty child-target collisions, activate in dependency order, write local locks, and expose the Workdir. Plan is an Import preflight contract, not a required standalone CLI. Unknown Providers, contract mismatch, digest failure, unmet consumed Requirements, physical composition failure, and activation failure terminate Import and clean a new target.
 
-Export MUST read ownership, aggregate Status, reject unowned paths, invoke each Provider's ExportComponent, validate immutable references and payloads, set an optional parent digest, and atomically write the Artifact. Every Export creates a new identity and never mutates an old Artifact.
+Export MUST read ownership, aggregate Status, reject unowned paths, invoke Provider ExportComponent from child to parent so each parent can validate child identities and native attachments, validate immutable references and payloads, set an optional parent digest, and atomically write the Artifact. Every Export creates a new identity and never mutates an old Artifact.
 
 ## 10. Security and conformance
 

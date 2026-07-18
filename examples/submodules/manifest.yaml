@@ -1,0 +1,41 @@
+api_version: loop.exchange/v1alpha1
+kind: ContextArtifact
+coordinates:
+  namespace: example
+  name: nested-submodule
+  version: 1.0.0
+  variant: checkpoint
+components:
+  - id: application
+    description: Parent repository; owns .gitmodules and the gitlink boundary.
+    path: repositories/application
+    provider: git
+    contract: v1
+    distribution: mirrored
+    reference:
+      locator: https://example.invalid/application.git
+      revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    embedded:
+      revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      payloads:
+        base:
+          media_type: application/vnd.git.bundle
+          digest: sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          size: 4096
+  - id: shared-library
+    description: Child repository; owns every entity below its nested root.
+    path: repositories/application/deps/shared-library
+    provider: git
+    contract: v1
+    distribution: embedded
+    embedded:
+      revision: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      payloads:
+        base:
+          media_type: application/vnd.git.bundle
+          digest: sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+          size: 2048
+requirements: []
+provenance:
+  created_at: "2026-07-18T00:00:00Z"
+  engine: lxp/0.1.0

@@ -9,7 +9,7 @@
     "api_version": { "const": "loop.exchange/v1alpha1" },
     "kind": { "const": "ContextArtifact" },
     "coordinates": { "$ref": "#/$defs/coordinates" },
-    "components": { "type": "array", "items": { "$ref": "#/$defs/component" } },
+    "components": { "$comment": "Component paths MUST be unique and MAY be lexically nested; deepest-root ownership and lifecycle ordering are semantic constraints outside JSON Schema.", "type": "array", "items": { "$ref": "#/$defs/component" } },
     "requirements": { "type": "array", "items": { "$ref": "#/$defs/requirement" } },
     "provenance": { "$ref": "#/$defs/provenance" }
   },

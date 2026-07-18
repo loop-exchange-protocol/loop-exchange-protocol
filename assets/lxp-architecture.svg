@@ -42,8 +42,8 @@
     <rect x="525" y="600" width="390" height="175" rx="20" fill="#f5f1ff" stroke="#7357c8" stroke-width="3"/>
     <text x="720" y="640" class="head">Session Workdir</text>
     <text x="720" y="675" class="body">可变工作视图 / mutable working view</text>
-    <text x="720" y="707" class="small">Roots prefix-free；内部对 Core 不透明</text>
-    <text x="720" y="734" class="small">Prefix-free roots; opaque internals</text>
+    <text x="720" y="707" class="small">Roots 可嵌套；实体归最深 owner</text>
+    <text x="720" y="734" class="small">Nested roots; deepest owner wins</text>
 
     <rect x="935" y="600" width="410" height="175" rx="20" fill="#fff6ed" stroke="#dc7b2a" stroke-width="3"/>
     <text x="1140" y="640" class="head">Artifact Repository + CAS</text>

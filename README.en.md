@@ -10,7 +10,7 @@ Init/Import → Work → Add → Status → Export
                          └── Provider ─┘
 ```
 
-LXP is not a deployment template, package installer, or workflow language. YAML is the machine exchange format; the CLI is the normal interface. Production MVP Artifacts are self-contained, content-addressed, and immutable.
+LXP is not a deployment template, package installer, or workflow language. YAML is the machine exchange format; the CLI is the normal interface. Production MVP Artifacts are content-addressed and immutable, while embedded provides standalone restore.
 
 ![LXP architecture](assets/lxp-architecture.svg)
 
@@ -28,11 +28,11 @@ The analogy stops at usage. The protocol permits different Provider types; the f
 
 ## Core rules
 
-1. **LXP tracks ownership; Providers track content.** A registered Component root is opaque to Core.
-2. Component roots are non-overlapping. Core does not recursively interpret `.git`, `.oss`, or other markers inside an owned root.
-3. `lxp add` inside a Component invokes its Provider's `Add`; only an unowned root triggers Provider discovery and Component registration.
+1. **LXP tracks ownership; Providers track content.** A Component is opaque to Core except for its direct child boundaries.
+2. Component roots are unique and may form a strictly nested lexical tree. Every entity path belongs only to its deepest root; ancestor Providers exclude child subtrees.
+3. `lxp add` normally invokes the deepest owning Provider. Native Provider discovery may register explicit child roots such as initialized submodules as nested Components.
 4. A Provider is identified by stable `provider + contract`; Provider-specific `config` is opaque to Core.
-5. Recursive or composite semantics belong in one composite Provider; Core still sees one Component.
+5. The protocol defines no mount-capability or Provider-pair matrix. A Provider fails closed when a concrete parent/child path cannot be composed physically.
 6. Artifacts never carry executable Provider code. Import requires a preinstalled, trusted matching Provider contract and otherwise fails.
 7. Providers may materialize with symlinks, Git worktrees, copies, reflinks, or mounts. The protocol standardizes the result, not the mechanism.
 8. The Production MVP composes `git@v1` only, but fully supports reference, embedded, and mirrored `.lxpz` Artifacts; no matching Provider means failure.
@@ -62,7 +62,7 @@ cd ..
 lxp import review-loop.lxpz continued
 ```
 
-Within a Git Component, `lxp add` invokes the native Git index without creating a nested Component. An unowned path with no matching Provider fails. `lxp import` validates the Artifact, displays Provider actions, and checks Requirements before any side effect.
+Within a Git Component, `lxp add` invokes the native Git index. Every initialized submodule becomes a nested Git Component, and Export strictly verifies its parent gitlink against the child locked revision. An unowned path with no matching Provider fails. `lxp import` validates the Artifact, displays Provider actions, and checks Requirements before any side effect.
 
 ## Documentation
 
@@ -77,6 +77,7 @@ Within a Git Component, `lxp add` invokes the native Git index without creating 
 - [Complete executable quickstart](examples/quickstart/README.en.md) · [中文](examples/quickstart/README.md)
 - [Artifact YAML example](examples/artifact/README.en.md) · [中文](examples/artifact/README.md)
 - [Reference/Mirrored YAML examples](examples/distributions/README.en.md) · [中文](examples/distributions/README.md)
+- [Nested Component/Submodule YAML example](examples/submodules/README.en.md) · [中文](examples/submodules/README.md)
 - [ContextArtifact Schema](schemas/v1alpha1/context-artifact.schema.json)
 - [Artifact Lock Schema](schemas/v1alpha1/artifact-lock.schema.json)
 - [Standalone HTML overview](dist/import-export-protocol.html)
