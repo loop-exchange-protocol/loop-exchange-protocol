@@ -108,7 +108,11 @@ Export MUST 读取 Provider 选择的当前状态。Git Provider 的 Add/Status 
 - `embedded`：Artifact 内的内容寻址 payload；
 - `mirrored`：同一状态的 reference 与 embedded fallback。
 
-不支持的 distribution MUST 失败。Standalone Artifact 的所有消费内容必须 embedded，并能在 exporter Engine state 与原始 source 删除后 Import。Production MVP 只允许 embedded；reference 与 mirrored 保留为实验性 wire capability，不属于生产 conformance。
+`mirrored.reference.revision` 与 `mirrored.embedded.revision` MUST 完全相同。Importer MUST 先尝试 reference；reference 无法恢复时 MUST 清理部分物化结果，再使用已经过 digest/size 校验的 embedded fallback。Provider 不得用 fallback 掩盖 revision mismatch、payload 校验失败或 contract mismatch。
+
+Reference locator MUST 是 Provider contract 声明的 portable identity，不得包含 secret、本地物化路径或 Provider Store path。Reference 的可用性依赖外部 source；无法访问时 reference Import 失败。Mirrored fallback MUST 表示与 reference 相同的 Provider-selected state，但 MAY 明确排除 contract 声明为外部 Requirement 的对象。
+
+不支持的 distribution MUST 失败。Standalone Artifact 的所有消费内容必须 embedded，并能在 exporter Engine state 与原始 source 删除后 Import。Production MVP 只允许 embedded；reference 与 mirrored 是已定义但仍在生产 conformance 之外的实验性 capability。结构和选择规则见 [Distribution 指南](distributions.md)。
 
 ## 7. Requirements 与 activation
 

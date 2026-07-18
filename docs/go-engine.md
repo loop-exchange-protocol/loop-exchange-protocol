@@ -32,6 +32,12 @@ Production Export 只生成 embedded Artifact：当前 `HEAD` 的最小 Git bund
 
 为保证 standalone 语义，Git Provider 拒绝 shallow repository、submodule/gitlink、escaping symlink 和 clean/smudge filter（包括 Git LFS）。Artifact output 不覆盖现有路径；Import target 必须不存在，失败时清理新 target。
 
+## 实验 Distribution API
+
+Go Engine 与 `git@v1` Provider API 额外实现 reference/mirrored，但官方 Production CLI 不提供对应 flag，也不接受这两种 Artifact。Reference 使用安全 network locator + 完整 commit ID；mirrored 在 reference 不可用时回退到相同 revision 的 embedded base。两种模式都要求 index 与 `HEAD` 一致，不能运输 staged patch。
+
+完整规则和 YAML 见 [Distribution 指南](distributions.md)；四个真实仓库的可执行验证位于 [`go-provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp)。
+
 ## Requirements 与信任边界
 
 `lxp requirements` 不物化 Artifact；它检查 executable、MCP 与 credential contract，TUI 只持久化本地非 secret policy profile。Executable/MCP probe 必须显式授权；Credential 只保存 local binding 名称，值不进入 Artifact、lock、argv 或 log。

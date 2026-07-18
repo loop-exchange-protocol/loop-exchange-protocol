@@ -32,6 +32,12 @@ Production Export creates embedded Artifacts only: a minimal Git bundle for the 
 
 To preserve standalone semantics, the Git Provider rejects shallow repositories, submodules/gitlinks, escaping symlinks, and clean/smudge filters including Git LFS. Artifact output never overwrites an existing path; an Import target must not exist and a failed Import removes the new target.
 
+## Experimental Distribution API
+
+The Go Engine and `git@v1` Provider APIs additionally implement reference and mirrored, while the official Production CLI exposes no matching flag and rejects both Artifact forms. Reference uses a safe network locator plus full commit ID. Mirrored falls back to an embedded base at the same revision when its reference is unavailable. Both modes require an index matching `HEAD` and cannot transport a staged patch.
+
+See the [Distribution guide](distributions.en.md) for complete rules and YAML, and the [`go-provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp) for executable validation with four real repositories.
+
 ## Requirements and trust boundary
 
 `lxp requirements` does not materialize the Artifact. It checks executable, MCP, and credential contracts, and its TUI persists only a local non-secret policy profile. Executable and MCP probes require explicit authorization. Credentials persist local binding names only; values never enter Artifacts, locks, argv, or logs.

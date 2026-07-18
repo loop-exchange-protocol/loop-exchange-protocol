@@ -80,7 +80,7 @@
       "allOf": [
         { "if": { "properties": { "distribution": { "const": "reference" } } }, "then": { "required": ["reference"], "not": { "required": ["embedded"] } } },
         { "if": { "properties": { "distribution": { "const": "embedded" } } }, "then": { "required": ["embedded"], "not": { "required": ["reference"] } } },
-        { "if": { "properties": { "distribution": { "const": "mirrored" } } }, "then": { "required": ["reference", "embedded"] } }
+        { "if": { "properties": { "distribution": { "const": "mirrored" } } }, "then": { "$comment": "reference.revision and embedded.revision MUST be equal; enforce this semantic constraint outside JSON Schema", "required": ["reference", "embedded"] } }
       ]
     },
     "path": {

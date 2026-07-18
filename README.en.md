@@ -37,6 +37,8 @@ The analogy stops at usage. The protocol permits different Provider types; the f
 7. Providers may materialize with symlinks, Git worktrees, copies, reflinks, or mounts. The protocol standardizes the result, not the mechanism.
 8. The Production MVP composes `git@v1` only and exports embedded Artifacts only; no matching Provider means failure.
 
+The general wire model also defines reference and mirrored. The current Go Engine/Provider API implements them experimentally without changing the Production CLI's embedded-only surface or conformance boundary; see the [Distribution guide](docs/distributions.en.md).
+
 ## Quick start
 
 The fastest route is the complete black-box quickstart:
@@ -68,11 +70,13 @@ Within a Git Component, `lxp add` invokes the native Git index without creating 
 - [Production MVP Profile](docs/production-mvp.en.md) · [中文](docs/production-mvp.md)
 - [Go SDK and CLI](docs/go-engine.en.md) · [中文](docs/go-engine.md)
 - [Requirements](docs/requirements.en.md) · [中文](docs/requirements.md)
+- [Distribution guide](docs/distributions.en.md) · [中文](docs/distributions.md)
 - [v1alpha1 conformance matrix](docs/conformance.en.md) · [中文](docs/conformance.md)
 - [Ecosystem repository organization](docs/ecosystem.en.md) · [中文](docs/ecosystem.md)
 - [Git-like CLI example](examples/git-like/README.en.md) · [中文](examples/git-like/README.md)
 - [Complete executable quickstart](examples/quickstart/README.en.md) · [中文](examples/quickstart/README.md)
 - [Artifact YAML example](examples/artifact/README.en.md) · [中文](examples/artifact/README.md)
+- [Reference/Mirrored YAML examples](examples/distributions/README.en.md) · [中文](examples/distributions/README.md)
 - [ContextArtifact Schema](schemas/v1alpha1/context-artifact.schema.json)
 - [Artifact Lock Schema](schemas/v1alpha1/artifact-lock.schema.json)
 - [Standalone HTML overview](dist/import-export-protocol.html)

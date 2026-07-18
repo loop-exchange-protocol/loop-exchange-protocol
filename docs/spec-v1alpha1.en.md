@@ -93,7 +93,13 @@ Discovery markers matter only during initial registration. `.git` matches `git@v
 
 Export reads Provider-selected current state. Git Provider Add/Status aligns with the Git index. Export MUST NOT silently include Git-untracked content.
 
-Each Component records `reference`, `embedded`, or `mirrored` distribution. References contain immutable Provider-native locators and revisions. Embedded payloads are content-addressed. Mirrored contains equivalent reference and fallback. Unsupported distribution MUST fail. A standalone Artifact embeds all consumed content and imports after deleting the exporter Engine state and original sources. The Production MVP permits embedded only; reference and mirrored remain experimental wire capabilities outside production conformance.
+Each Component records `reference`, `embedded`, or `mirrored` distribution. References contain immutable Provider-native locators and revisions. Embedded payloads are content-addressed. Mirrored contains an equivalent reference and fallback.
+
+`mirrored.reference.revision` and `mirrored.embedded.revision` MUST be identical. Import MUST try the reference first; if it cannot restore, Import MUST remove partial materialization before using the already digest- and size-verified embedded fallback. A Provider cannot use fallback to hide a revision mismatch, payload validation failure, or contract mismatch.
+
+A reference locator MUST be a portable identity declared by its Provider contract and cannot contain secrets, local materialization paths, or Provider Store paths. Reference availability depends on its external source, so an unavailable source fails reference Import. A mirrored fallback MUST represent the same Provider-selected state, but MAY explicitly exclude objects that its contract declares as external Requirements.
+
+Unsupported distributions MUST fail. A standalone Artifact embeds all consumed content and imports after deleting the exporter Engine state and original sources. The Production MVP permits embedded only; reference and mirrored are defined experimental capabilities outside production conformance. See the [Distribution guide](distributions.en.md) for structure and selection rules.
 
 ## 7. Requirements and activation
 

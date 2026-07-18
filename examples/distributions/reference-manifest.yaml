@@ -1,0 +1,19 @@
+api_version: loop.exchange/v1alpha1
+kind: ContextArtifact
+coordinates:
+  namespace: examples
+  name: spring-ai-examples-reference
+  version: v1
+  variant: checkpoint
+components:
+  - id: spring-ai-examples
+    path: projects/spring-ai-examples
+    provider: git
+    contract: v1
+    distribution: reference
+    reference:
+      locator: https://github.com/spring-projects/spring-ai-examples.git
+      revision: 74164123ba2d13cba7ae185a460b133914106b69
+provenance:
+  created_at: "2026-07-18T00:00:00Z"
+  engine: lxp/example

@@ -14,12 +14,14 @@ This document defines language-neutral evidence required for a `loop.exchange/v1
 | `requirements-core` | Plan/checklist, dependency DAG, explicit executable/MCP policy, and credential-handle isolation | missing, ambiguous, and cyclic Requirements; unauthorized execution; secrets absent from files, locks, payloads, argv, and logs |
 | `standalone-portability` | restore from an embedded Artifact after deleting exporter state and original sources, then continue to another generation | destructive two-generation Export/Import Harness; identical Provider-selected bytes/state; empty directories and safe symlinks only when claimed by the contract |
 | `production-git-v1` | official CLI composes `git@v1` only, embedded-only exchange, index-selection round trip, minimal HEAD bundle, and parent advancement | rejection of reference/mirrored, shallow repositories, submodules, filters, escaping symlinks, and extra payload roles; failed Import target cleanup |
+| `git-v1-alpha-distributions` | Git reference and mirrored through the Go Engine/Provider API without expanding the Production CLI | online reference restore; offline reference failure and cleanup; mirrored fallback under the same outage; rejection of secret/local locators, revision mismatch, and staged index state; declared LFS pointer mode never executes filters |
 
-An implementation claims only the Profiles it actually passes. An Artifact-codec-only library cannot claim `tracking-core`; a Provider declares `provider-CONTRACT` together with its exact contract version. A Production MVP release claims all five base Profiles, instantiating `provider-CONTRACT` as `provider-git-v1`, plus `production-git-v1`.
+An implementation claims only the Profiles it actually passes. An Artifact-codec-only library cannot claim `tracking-core`; a Provider declares `provider-CONTRACT` together with its exact contract version. A Production MVP release claims all five base Profiles, instantiating `provider-CONTRACT` as `provider-git-v1`, plus `production-git-v1`. Implementing `git-v1-alpha-distributions` does not add reference or mirrored to the Production Profile and cannot change the public CLI's embedded-only default or acceptance boundary.
 
 ## Canonical vectors
 
 - [`examples/artifact/manifest.yaml`](../examples/artifact/manifest.yaml) and [`lock.yaml`](../examples/artifact/lock.yaml) are readable canonical exchange vectors.
+- [`examples/distributions/`](../examples/distributions/README.en.md) provides reference/mirrored manifest and lock structure vectors; the specification repository does not commit their large payloads.
 - [`examples/quickstart/run.sh`](../examples/quickstart/run.sh) is a two-generation black-box journey consumable by SDKs and CLIs, not a normative source for one language implementation.
 - [`schemas/v1alpha1/`](../schemas/v1alpha1/) defines structural constraints. Passing Schema validation is necessary but insufficient for conformance.
 

@@ -1,0 +1,28 @@
+api_version: loop.exchange/v1alpha1
+kind: ContextArtifact
+coordinates:
+  namespace: examples
+  name: spring-ai-mirrored
+  version: v1
+  variant: checkpoint
+components:
+  - id: spring-ai
+    path: upstream/spring-ai
+    provider: git
+    contract: v1
+    config:
+      lfs_mode: pointer
+    distribution: mirrored
+    reference:
+      locator: https://github.com/spring-projects/spring-ai.git
+      revision: fb51ef2b49c2e2b1d652ee4acbade69b225e5d1a
+    embedded:
+      revision: fb51ef2b49c2e2b1d652ee4acbade69b225e5d1a
+      payloads:
+        base:
+          media_type: application/vnd.git.bundle
+          digest: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+          size: 123456
+provenance:
+  created_at: "2026-07-18T00:00:00Z"
+  engine: lxp/example
