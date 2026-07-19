@@ -51,7 +51,7 @@ lxp requirements [--format tui|json] ARTIFACT.lxpz
 
 `git@v1` Production Export 拒绝 shallow repository、无法安全初始化或仍未注册的 submodule、gitlink/child revision mismatch、跨越 symlink 的 nested root 与 escaping symlink。每个 submodule 作为独立 Component 按自己的 distribution 交换；父 Git bundle 不携带子仓库 objects。Embedded 拒绝 clean/smudge filter；reference/mirrored 可声明 `lfs_mode: pointer`，只交换 Git tree 中的 canonical LFS pointer，不执行 filter，也不承诺携带外部 LFS object。
 
-Import 按父到子恢复：父 checkout 只能给 child 留下 absent 或 empty directory；非空、文件或 symlink collision 失败。Export 按子到父执行：父 Provider MUST 验证 selected gitlink 等于 child Component 的 locked revision。`lxp add` 对缺失 submodule 执行逐层 `git submodule update --init --checkout`，只 checkout 当前 gitlink 锁定 revision，再把 child 注册为独立 Component；已初始化 child 保持当前 revision，不隐式 fetch 或跟进 remote。Child 内路径进入 child index，child root selection 同步父 gitlink。递归 submodule 重复相同规则；unsafe symlink/non-empty collision 或初始化失败会使 Add 失败。
+Import 按父到子恢复：父 checkout 只能给 child 留下 absent 或 empty directory；非空、文件或 symlink collision 失败。父 Restore MUST 在 child content 恢复前对 declared native submodule 执行 config-only `git submodule init`；discovery MUST 幂等修复已存在 child 缺失的父仓 config，两者都不得因此 fetch 或 checkout。Export 按子到父执行：父 Provider MUST 验证 selected gitlink 等于 child Component 的 locked revision。`lxp add` 对缺失 submodule 执行逐层 `git submodule update --init --checkout`，只 checkout 当前 gitlink 锁定 revision，再把 child 注册为独立 Component；已初始化 child 保持当前 revision，不隐式 fetch 或跟进 remote。Child 内路径进入 child index，child root selection 同步父 gitlink。递归 submodule 重复相同规则；unsafe symlink/non-empty collision 或初始化失败会使 Add 失败。
 
 ## Failure 与持久化保证
 

@@ -63,7 +63,7 @@ cd ..
 lxp import review-loop.lxpz continued
 ```
 
-Within a Git Component, `lxp add` invokes the native Git index. A missing submodule is initialized at its gitlink-locked revision and recursively becomes a nested Git Component, but is never advanced automatically to a newer remote revision. Export strictly verifies its parent gitlink against the child locked revision. An unowned path with no matching Provider fails. `lxp import` validates the Artifact, displays Provider actions, and checks Requirements before any side effect.
+Within a Git Component, `lxp add` invokes the native Git index. A missing submodule is initialized at its gitlink-locked revision and recursively becomes a nested Git Component, but is never advanced automatically to a newer remote revision. Import and discovery use config-only `git submodule init` to keep parent native config consistent with a restored child, without fetching or checking out content. Export strictly verifies its parent gitlink against the child locked revision. An unowned path with no matching Provider fails. `lxp import` validates the Artifact, displays Provider actions, and checks Requirements before any side effect.
 
 ## Documentation
 

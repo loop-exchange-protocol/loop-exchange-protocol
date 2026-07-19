@@ -47,7 +47,7 @@ git clone YOUR_REPOSITORY source
 lxp add source
 ```
 
-自动初始化只 checkout 每个 gitlink 当前锁定的 commit，不等同于 `git submodule update --remote`。Symlink/non-empty target collision、不可访问 locator 或 checkout 失败都会使 Add 失败。
+自动初始化只 checkout 每个 gitlink 当前锁定的 commit，不等同于 `git submodule update --remote`。Import 在恢复 child content 前用 `git submodule init` 写入父仓 native config；discovery 会幂等修复缺失 config，这两个 config-only 操作都不 fetch 或 checkout。Symlink/non-empty target collision、不可访问 locator 或 checkout 失败都会使 Add 失败。
 
 CLI 外部操作默认 15 分钟 timeout，可用 `LXP_TIMEOUT=30m` 等正数 Go duration 覆盖。所有 Git 子进程继承该 Context；Provider 在 SDK 调用方没有 deadline 时使用 5 分钟默认值。Git terminal/askpass/GCM interactive prompt 被禁用，认证需预先由非交互 credential helper 或 SSH agent 提供。
 

@@ -47,7 +47,7 @@ git clone YOUR_REPOSITORY source
 lxp add source
 ```
 
-Automatic initialization checks out only the commit currently locked by each gitlink; it is not `git submodule update --remote`. A symlink/non-empty target collision, unavailable locator, or failed checkout fails Add.
+Automatic initialization checks out only the commit currently locked by each gitlink; it is not `git submodule update --remote`. Import uses `git submodule init` to write parent native config before child content restore, and discovery idempotently repairs missing config; neither config-only operation fetches or checks out content. A symlink/non-empty target collision, unavailable locator, or failed checkout fails Add.
 
 CLI external operations have a 15-minute timeout by default; override it with a positive Go duration such as `LXP_TIMEOUT=30m`. Every Git child process inherits that Context, while the Provider applies a five-minute default when an SDK caller supplies no deadline. Git terminal/askpass/GCM interactive prompts are disabled, so authentication must already be available from a non-interactive credential helper or SSH agent.
 

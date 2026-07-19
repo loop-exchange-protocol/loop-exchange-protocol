@@ -24,7 +24,7 @@ make ci
 - Secrets never enter manifests, locks, payloads, argv, or logs. Executable and MCP actions require explicit authorization.
 - CLI/Provider external operations inherit a cancellable execution context with a deadline, never wait for interactive credentials, and bound diagnostic output.
 - Unowned, non-ignored paths block Export. Git-untracked content is never exported silently.
-- During `lxp add`, `git@v1` initializes each missing submodule at its gitlink-locked revision and recursively registers it as an independent nested Component; it never advances an initialized submodule to a newer remote revision. Export validates gitlink/revision from child to parent; Import restores parent to child and rejects symlink/non-empty collisions.
+- During `lxp add`, `git@v1` initializes each missing submodule at its gitlink-locked revision and recursively registers it as an independent nested Component; it never advances an initialized submodule to a newer remote revision. Import and discovery use config-only `git submodule init` to keep parent native config consistent with a restored child, without fetching or checking out content. Export validates gitlink/revision from child to parent; Import restores parent to child and rejects symlink/non-empty collisions.
 - `git@v1` applies the same 256 MiB embedded staged-patch limit at Export and Import; Export cannot create an Artifact this contract cannot restore.
 - Conversations may continue; execution replay is unsupported.
 

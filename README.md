@@ -63,7 +63,7 @@ cd ..
 lxp import review-loop.lxpz continued
 ```
 
-Git Component 内的 `lxp add` 调用 Git Provider 的原生 index 语义；缺失 submodule 按 gitlink 锁定 revision 自动初始化，并递归成为嵌套 Git Component，但不会自动跟进远端新 revision。父 gitlink 与子 locked revision 在 Export 时强校验。未归属 path 没有匹配 Provider 时失败。`lxp import` 会在任何副作用前验证 Artifact、展示 Provider actions 并检查 Requirements。
+Git Component 内的 `lxp add` 调用 Git Provider 的原生 index 语义；缺失 submodule 按 gitlink 锁定 revision 自动初始化，并递归成为嵌套 Git Component，但不会自动跟进远端新 revision。Import/discovery 通过 config-only `git submodule init` 保持父仓 native config 与 restored child 一致，不会因此 fetch 或 checkout。父 gitlink 与子 locked revision 在 Export 时强校验。未归属 path 没有匹配 Provider 时失败。`lxp import` 会在任何副作用前验证 Artifact、展示 Provider actions 并检查 Requirements。
 
 ## 文档
 
