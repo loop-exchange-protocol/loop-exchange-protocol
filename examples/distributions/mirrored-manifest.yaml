@@ -8,8 +8,10 @@ coordinates:
 components:
   - id: spring-ai
     path: upstream/spring-ai
-    provider: git
-    contract: v1
+    provider:
+      namespace: loop.exchange
+      name: git
+      version: v1
     config:
       lfs_mode: pointer
     distribution: mirrored

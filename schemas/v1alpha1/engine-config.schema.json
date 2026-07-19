@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loop.exchange/schemas/v1alpha1/engine-config.schema.json",
+  "title": "Loop Exchange EngineConfig",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind"],
+  "properties": {
+    "api_version": { "const": "loop.exchange/v1alpha1" },
+    "kind": { "const": "EngineConfig" },
+    "repositories": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/repository" } },
+    "bindings": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/binding" } }
+  },
+  "$defs": {
+    "identifier": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "namespace": { "type": "string", "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "contract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["namespace", "name", "version"],
+      "properties": {
+        "namespace": { "$ref": "#/$defs/namespace" },
+        "name": { "$ref": "#/$defs/identifier" },
+        "version": { "$ref": "#/$defs/identifier" }
+      }
+    },
+    "package": {
+      "type": "object", "additionalProperties": false,
+      "required": ["namespace", "name", "version"],
+      "properties": {
+        "namespace": { "$ref": "#/$defs/namespace" },
+        "name": { "$ref": "#/$defs/identifier" },
+        "version": { "$ref": "#/$defs/identifier" }
+      }
+    },
+    "repository": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "url"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "url": { "type": "string", "format": "uri", "minLength": 1 },
+        "credential": { "$ref": "#/$defs/identifier" }
+      }
+    },
+    "implementation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source", "package"],
+      "properties": {
+        "source": { "enum": ["builtin", "repository"] },
+        "package": { "$ref": "#/$defs/package" },
+        "digest": { "$ref": "#/$defs/digest" }
+      },
+      "allOf": [
+        { "if": { "properties": { "source": { "const": "builtin" } } }, "then": { "not": { "required": ["digest"] } } },
+        { "if": { "properties": { "source": { "const": "repository" } } }, "then": { "required": ["digest"] } }
+      ]
+    },
+    "binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "contract", "implementation"],
+      "properties": {
+        "kind": { "enum": ["provider", "checker"] },
+        "contract": { "$ref": "#/$defs/contract" },
+        "implementation": { "$ref": "#/$defs/implementation" }
+      }
+    }
+  }
+}

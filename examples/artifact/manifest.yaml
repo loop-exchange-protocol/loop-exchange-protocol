@@ -9,8 +9,10 @@ components:
   - id: source
     description: Self-contained Git repository and selected index state
     path: source
-    provider: git
-    contract: v1
+    provider:
+      namespace: loop.exchange
+      name: git
+      version: v1
     distribution: embedded
     embedded:
       revision: 0123456789abcdef0123456789abcdef01234567

@@ -3,19 +3,19 @@
   <desc id="desc">Artifact 导入 Session，经 Work、Add、Status 后导出有父状态的新不可变 Artifact。</desc>
   <defs><style>text{font-family:Inter,"Noto Sans SC",system-ui,sans-serif;fill:#172033}.title{font-size:42px;font-weight:800}.sub{font-size:18px;fill:#526078}.n{font-size:20px;font-weight:750}.b{font-size:16px}.s{font-size:14px;fill:#526078}.arrow{stroke:#45556f;stroke-width:4;fill:none;marker-end:url(#a)}.loop{stroke:#7357c8;stroke-width:4;fill:none;marker-end:url(#a)}</style><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 10 5 0 10z" fill="#45556f"/></marker></defs>
   <rect width="1440" height="760" fill="#fbfcfe"/>
-  <text x="720" y="62" text-anchor="middle" class="title">Init / Clone → Work → Add / Status → Export</text>
-  <text x="720" y="96" text-anchor="middle" class="sub">每次 Import 创建新 Session；每次 Export 创建新版本 / Every operation crosses an immutable Artifact boundary</text>
+  <text x="720" y="62" text-anchor="middle" class="title">Import → Work → Add / Status → Export</text>
+  <text x="720" y="96" text-anchor="middle" class="sub">Import 幂等协调 Session；每次 Export 创建新 Artifact / Import reconciles; Export creates a new Artifact</text>
   <g text-anchor="middle">
     <rect x="60" y="170" width="235" height="165" rx="20" fill="#eef4ff" stroke="#3569d4" stroke-width="3"/><text x="177" y="215" class="n">输入 / Input</text><text x="177" y="267" class="b">ContextArtifact</text><text x="177" y="299" class="s">immutable state</text>
-    <rect x="345" y="170" width="235" height="165" rx="20" fill="#effaf4" stroke="#26945d" stroke-width="3"/><text x="462" y="215" class="n">Init / Clone</text><text x="462" y="250" class="s">Plan / Restore</text><text x="462" y="278" class="s">Check Requirements</text><text x="462" y="306" class="s">Activate Components</text>
+    <rect x="345" y="170" width="235" height="165" rx="20" fill="#effaf4" stroke="#26945d" stroke-width="3"/><text x="462" y="215" class="n">Import</text><text x="462" y="250" class="s">Validate · Resolve contracts</text><text x="462" y="278" class="s">Check Requirements</text><text x="462" y="306" class="s">Apply parent → child</text>
     <rect x="630" y="170" width="235" height="165" rx="20" fill="#f5f1ff" stroke="#7357c8" stroke-width="3"/><text x="747" y="215" class="n">Work · Add · Status</text><text x="747" y="250" class="s">Session Workdir</text><text x="747" y="278" class="s">Provider-native selection</text><text x="747" y="306" class="s">ownership · changes · ignore</text>
-    <rect x="915" y="170" width="235" height="165" rx="20" fill="#effaf4" stroke="#26945d" stroke-width="3"/><text x="1032" y="215" class="n">Export</text><text x="1032" y="250" class="s">Read every Component</text><text x="1032" y="278" class="s">Verify immutable refs</text><text x="1032" y="306" class="s">Rebuild manifest + lock</text>
+    <rect x="915" y="170" width="235" height="165" rx="20" fill="#effaf4" stroke="#26945d" stroke-width="3"/><text x="1032" y="215" class="n">Export</text><text x="1032" y="250" class="s">Read every Component</text><text x="1032" y="278" class="s">Verify immutable refs</text><text x="1032" y="306" class="s">Write manifest + payloads</text>
     <rect x="1200" y="170" width="180" height="165" rx="20" fill="#fff6ed" stroke="#dc7b2a" stroke-width="3"/><text x="1290" y="215" class="n">Artifact</text><text x="1290" y="252" class="b">reference</text><text x="1290" y="280" class="b">embedded</text><text x="1290" y="308" class="b">mirrored</text>
   </g>
   <path d="M295 252h50M580 252h50M865 252h50M1150 252h50" class="arrow"/>
   <path d="M1290 335v160H462v-160" class="loop"/>
-  <text x="875" y="530" text-anchor="middle" class="n">Import as a new Session → Continue → Export with parent digest</text>
-  <text x="875" y="560" text-anchor="middle" class="s">导入为新 Session → 继续工作 → 携带父 digest 导出</text>
+  <text x="875" y="530" text-anchor="middle" class="n">Import or retry → Continue → Export with parent digest</text>
+  <text x="875" y="560" text-anchor="middle" class="s">导入或重试 → 继续工作 → 携带父 digest 导出</text>
   <rect x="95" y="610" width="1250" height="95" rx="16" fill="#fff" stroke="#8390a5" stroke-width="2"/>
   <text x="720" y="648" text-anchor="middle" class="b">Embedded portability test: delete exporter Engine root and original Git source before consumer Import.</text>
   <text x="720" y="679" text-anchor="middle" class="b">Embedded 可移植性测试：Consumer Import 前必须删除 exporter Engine root 与原始 Git source。</text>

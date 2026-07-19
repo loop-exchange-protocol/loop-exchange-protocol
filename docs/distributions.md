@@ -2,7 +2,7 @@
 
 [English](distributions.en.md) | **中文主版本**
 
-本文解释 `reference`、`embedded` 与 `mirrored` 的选择和当前 `git@v1` Production MVP 行为。规范性规则仍以 [v1alpha1 规范](spec-v1alpha1.md)和 [Schema](../schemas/v1alpha1/context-artifact.schema.json)为准。
+本文解释 `reference`、`embedded` 与 `mirrored` 的选择和当前 `loop.exchange:git:v1` Production MVP 行为。规范性规则仍以 [v1alpha1 规范](spec-v1alpha1.md)和 [Schema](../schemas/v1alpha1/context-artifact.schema.json)为准。
 
 ## 三种分发方式
 
@@ -16,7 +16,7 @@
 
 对应的完整 YAML 结构见 [`examples/distributions/`](../examples/distributions/README.md)。YAML 是交换格式；用户不需要日常手写这些字段。
 
-## `git@v1` 规则
+## `loop.exchange:git:v1` 规则
 
 当前 Go Git Provider 遵循：
 
@@ -27,7 +27,7 @@
 - reference Import 保留安全 origin；mirrored fallback 恢复后也保留同一 origin identity；
 - partial/shallow repository、无法安全初始化或未注册的 submodule、gitlink/child revision mismatch、escaping symlink 与未声明 filter 失败。
 
-Git submodule 不从父 bundle 隐式恢复。`lxp add` 会按 gitlink 锁定 revision 自动初始化缺失 submodule，并把每个 submodule 注册为 path 嵌套的独立 `git@v1` Component，使其拥有自己的 locator/revision/payload；父 Provider 只保留 `.gitmodules` 与 gitlink，并验证 selected gitlink 等于 child locked revision。Import 父到子执行，Export 子到父执行。完整 YAML 见 [`examples/submodules/`](../examples/submodules/README.md)。
+Git submodule 不从父 bundle 隐式恢复。`lxp add` 会按 gitlink 锁定 revision 自动初始化缺失 submodule，并把每个 submodule 注册为 path 嵌套的独立 `loop.exchange:git:v1` Component，使其拥有自己的 locator/revision/payload；父 Provider 只保留 `.gitmodules` 与 gitlink，并验证 selected gitlink 等于 child locked revision。Import 父到子执行，Export 子到父执行。完整 YAML 见 [`examples/submodules/`](../examples/submodules/README.md)。
 
 Spring AI 使用 Git LFS。Reference/mirrored Component 可以声明：
 
@@ -49,4 +49,4 @@ lxp export --distribution mirrored context.lxpz
 lxp import context.lxpz continued                 # 自动读取 distribution
 ```
 
-[`go-provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp) 直接使用公开 `lxp` CLI 和四个真实 Git Component，验证 reference 在线恢复、reference 离线失败/清理与 mirrored 离线 fallback。`v1alpha1` 不承诺兼容性，并且只面向可信 Artifact、locator 与本地 Provider。
+[`provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/provider-git/tree/main/harness/spring-ai-mcp) 直接使用公开 `lxp` CLI 和四个真实 Git Component，验证 reference 在线 Import、reference 离线失败后保留可重试状态与 mirrored 离线 fallback。`v1alpha1` 不承诺兼容性，并且只面向可信 Artifact、locator 与本地 Provider。

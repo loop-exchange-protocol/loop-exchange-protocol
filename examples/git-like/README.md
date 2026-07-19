@@ -5,7 +5,7 @@
 此示例只使用正常 CLI，不要求手写协议 YAML：
 
 ```bash
-go install github.com/loop-exchange-protocol/go-sdk/cmd/lxp@latest
+go install github.com/loop-exchange-protocol/lxp/cmd/lxp@latest
 LXP_BIN="$(command -v lxp)"
 "$LXP_BIN" init /tmp/lxp-demo
 cd /tmp/lxp-demo

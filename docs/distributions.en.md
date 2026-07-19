@@ -2,7 +2,7 @@
 
 **English** | [中文主版本](distributions.md)
 
-This guide explains how to choose `reference`, `embedded`, or `mirrored`, plus the current `git@v1` Production MVP behavior. The [v1alpha1 specification](spec-v1alpha1.en.md) and [Schema](../schemas/v1alpha1/context-artifact.schema.json) remain normative.
+This guide explains how to choose `reference`, `embedded`, or `mirrored`, plus the current `loop.exchange:git:v1` Production MVP behavior. The [v1alpha1 specification](spec-v1alpha1.en.md) and [Schema](../schemas/v1alpha1/context-artifact.schema.json) remain normative.
 
 ## Three distribution forms
 
@@ -16,7 +16,7 @@ Mirrored does not contain two different versions. Its reference and embedded rev
 
 See [`examples/distributions/`](../examples/distributions/README.en.md) for complete YAML structures. YAML is the exchange format; users are not expected to author these fields in daily work.
 
-## `git@v1` rules
+## `loop.exchange:git:v1` rules
 
 The current Go Git Provider follows these rules:
 
@@ -27,7 +27,7 @@ The current Go Git Provider follows these rules:
 - reference Import retains its safe origin, and mirrored fallback retains the same origin identity;
 - partial/shallow repositories, submodules that cannot be initialized safely or remain unregistered, gitlink/child-revision mismatch, escaping symlinks, and undeclared filters fail.
 
-A Git submodule is never restored implicitly from its parent bundle. `lxp add` initializes a missing submodule at its gitlink-locked revision and registers every submodule as an independently distributed nested `git@v1` Component with its own locator, revision, and payload. The parent Provider retains only `.gitmodules` and the gitlink, and verifies that the selected gitlink equals the child locked revision. Import runs parent to child and Export child to parent. See [`examples/submodules/`](../examples/submodules/README.en.md) for complete YAML.
+A Git submodule is never restored implicitly from its parent bundle. `lxp add` initializes a missing submodule at its gitlink-locked revision and registers every submodule as an independently distributed nested `loop.exchange:git:v1` Component with its own locator, revision, and payload. The parent Provider retains only `.gitmodules` and the gitlink, and verifies that the selected gitlink equals the child locked revision. Import runs parent to child and Export child to parent. See [`examples/submodules/`](../examples/submodules/README.en.md) for complete YAML.
 
 Spring AI uses Git LFS. A reference or mirrored Component can declare:
 
@@ -49,4 +49,4 @@ lxp export --distribution mirrored context.lxpz
 lxp import context.lxpz continued                 # reads distribution automatically
 ```
 
-The [`go-provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp) directly uses the public `lxp` CLI and four real Git Components to verify online reference restore, offline reference failure/cleanup, and offline mirrored fallback. `v1alpha1` carries no compatibility promise and is limited to trusted Artifacts, locators, and locally installed Providers.
+The [`provider-git` Spring AI + MCP Harness](https://github.com/loop-exchange-protocol/provider-git/tree/main/harness/spring-ai-mcp) directly uses the public `lxp` CLI and four real Git Components to verify online reference Import, retryable state preservation after offline reference failure, and offline mirrored fallback. `v1alpha1` carries no compatibility promise and is limited to trusted Artifacts, locators, and locally installed Providers.

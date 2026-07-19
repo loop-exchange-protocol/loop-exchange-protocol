@@ -15,6 +15,7 @@
   },
   "$defs": {
     "identifier": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "namespace": { "type": "string", "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$" },
     "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
     "coordinates": {
       "type": "object", "additionalProperties": false,
@@ -26,6 +27,15 @@
         "variant": { "$ref": "#/$defs/identifier" }
       }
     },
+    "contract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["namespace", "name", "version"],
+      "properties": {
+        "namespace": { "$ref": "#/$defs/namespace" },
+        "name": { "$ref": "#/$defs/identifier" },
+        "version": { "$ref": "#/$defs/identifier" }
+      }
+    },
     "payload": {
       "type": "object", "additionalProperties": false,
       "required": ["media_type", "digest", "size"],
@@ -33,15 +43,6 @@
         "media_type": { "type": "string", "minLength": 1 },
         "digest": { "$ref": "#/$defs/digest" },
         "size": { "type": "integer", "minimum": 0 }
-      }
-    },
-    "componentSource": {
-      "type": "object", "additionalProperties": false,
-      "required": ["locator", "revision"],
-      "properties": {
-        "locator": { "type": "string" },
-        "revision": { "type": "string", "pattern": "^(?:[0-9a-fA-F]{40,64}|sha256:[0-9a-f]{64})$" },
-        "subdir": { "type": "string" }
       }
     },
     "reference": {
@@ -63,13 +64,12 @@
     },
     "component": {
       "type": "object", "additionalProperties": false,
-      "required": ["id", "path", "provider", "contract", "distribution"],
+      "required": ["id", "path", "provider", "distribution"],
       "properties": {
         "id": { "$ref": "#/$defs/identifier" },
         "description": { "type": "string", "maxLength": 2048 },
         "path": { "$ref": "#/$defs/path" },
-        "provider": { "$ref": "#/$defs/identifier" },
-        "contract": { "$ref": "#/$defs/identifier" },
+        "provider": { "$ref": "#/$defs/contract" },
         "config": { "type": "object" },
         "distribution": { "enum": ["reference", "embedded", "mirrored"] },
         "requires": { "type": "array", "items": { "$ref": "#/$defs/identifier" }, "uniqueItems": true },
@@ -94,42 +94,15 @@
         "id": { "$ref": "#/$defs/identifier" },
         "description": { "type": "string", "maxLength": 2048 },
         "prompt": { "type": "string", "maxLength": 8192 },
-        "provided_by": { "type": "string", "pattern": "^(?:environment|component:[A-Za-z0-9][A-Za-z0-9._-]{0,127})$" },
         "check": { "$ref": "#/$defs/check" }
       }
     },
     "check": {
-      "oneOf": [
-        { "$ref": "#/$defs/executableCheck" },
-        { "$ref": "#/$defs/mcpCheck" },
-        { "$ref": "#/$defs/credentialCheck" }
-      ]
-    },
-    "executableCheck": {
       "type": "object", "additionalProperties": false,
-      "required": ["type", "command"],
+      "required": ["checker"],
       "properties": {
-        "type": { "const": "executable" },
-        "command": { "type": "string", "pattern": "^[^/\\\\]+$" },
-        "args": { "type": "array", "items": { "type": "string" } }
-      }
-    },
-    "mcpCheck": {
-      "type": "object", "additionalProperties": false,
-      "required": ["type", "command"],
-      "properties": {
-        "type": { "const": "mcp" },
-        "command": { "type": "string", "pattern": "^[^/\\\\]+$" },
-        "args": { "type": "array", "items": { "type": "string" } },
-        "required_tools": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
-      }
-    },
-    "credentialCheck": {
-      "type": "object", "additionalProperties": false,
-      "required": ["type", "accepts"],
-      "properties": {
-        "type": { "const": "credential" },
-        "accepts": { "type": "array", "items": { "enum": ["ssh-agent", "environment", "bearer-token"] }, "minItems": 1, "uniqueItems": true }
+        "checker": { "$ref": "#/$defs/contract" },
+        "config": { "type": "object" }
       }
     },
     "provenance": {

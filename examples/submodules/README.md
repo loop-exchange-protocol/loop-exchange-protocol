@@ -10,7 +10,7 @@
 - Import 父到子物化；Export 子到父固定身份并验证 boundary。
 - Artifact 不声明 copy、symlink 或 mount capability。Provider 无法安全组合具体路径时直接失败。
 
-YAML 使用占位 digest/size 来突出结构，不附带大型 Git bundle。真实 CLI 会自动生成 manifest、payload 与 lock：
+YAML 使用占位 digest/size 来突出结构，不附带大型 Git bundle。真实 CLI 会自动生成 manifest 与 payload：
 
 ```bash
 git clone YOUR_REPOSITORY source

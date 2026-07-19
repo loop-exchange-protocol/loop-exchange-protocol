@@ -9,7 +9,7 @@
   </defs>
   <rect width="1440" height="900" fill="#fbfcfe"/>
   <text x="720" y="64" text-anchor="middle" class="title">LXP 协议架构 / Protocol Architecture</text>
-  <text x="720" y="98" text-anchor="middle" class="sub">运行时中立的 Agent Session Context 交换层 / Runtime-neutral exchange layer</text>
+  <text x="720" y="98" text-anchor="middle" class="sub">语言无关 contract，一套官方实现 / Language-neutral contracts, one official implementation</text>
 
   <rect x="70" y="135" width="1300" height="120" rx="20" class="band"/>
   <text x="105" y="174" class="head">调用方 / Callers</text>
@@ -23,21 +23,21 @@
   <path d="M720 255v55" class="arrow"/>
   <rect x="180" y="315" width="1080" height="205" rx="22" fill="#eef4ff" stroke="#3569d4" stroke-width="3"/>
   <text x="220" y="360" class="head">LXP Engine</text>
-  <text x="220" y="390" class="small">验证、编排、路径安全、所有权、锁与内容寻址 / validation, orchestration, path safety, ownership, locks, CAS</text>
+  <text x="220" y="390" class="small">验证、协调、路径安全、所有权与内容寻址 / validation, reconciliation, path safety, ownership, CAS</text>
   <g class="body" text-anchor="middle">
-    <rect x="245" y="420" width="220" height="65" rx="12" class="box blue"/><text x="355" y="450">Init / Clone</text><text x="355" y="475" class="small">Plan / Restore / Activate</text>
+    <rect x="245" y="420" width="220" height="65" rx="12" class="box blue"/><text x="355" y="450">Init / Import</text><text x="355" y="475" class="small">Validate · Check · Apply</text>
     <rect x="500" y="420" width="220" height="65" rx="12" class="box violet"/><text x="610" y="450">Work · Add · Status</text><text x="610" y="475" class="small">Route to owning Provider</text>
     <rect x="755" y="420" width="220" height="65" rx="12" class="box green"/><text x="865" y="450">Export</text><text x="865" y="475" class="small">reference / embedded / mirrored</text>
-    <rect x="1010" y="420" width="185" height="65" rx="12" class="box orange"/><text x="1102" y="450">Requirements</text><text x="1102" y="475" class="small">Declare → Check</text>
+    <rect x="1010" y="420" width="185" height="65" rx="12" class="box orange"/><text x="1102" y="450">Extensions</text><text x="1102" y="475" class="small">Contract → Binding</text>
   </g>
 
   <path d="M390 520v75" class="arrow"/><path d="M720 520v75" class="arrow"/><path d="M1050 520v75" class="arrow"/>
   <g text-anchor="middle">
     <rect x="95" y="600" width="410" height="175" rx="20" fill="#effaf4" stroke="#26945d" stroke-width="3"/>
     <text x="300" y="640" class="head">Component Providers</text>
-    <text x="300" y="675" class="body">Git · File · Filesystem</text>
-    <text x="300" y="707" class="small">Match · Plan · Add · Status</text>
-    <text x="300" y="734" class="small">Resolve · Restore · ExportComponent</text>
+    <text x="300" y="675" class="body">Git · Third-party contracts</text>
+    <text x="300" y="707" class="small">Contract · Match · Validate · Apply</text>
+    <text x="300" y="734" class="small">Add · Status · ExportComponent</text>
 
     <rect x="525" y="600" width="390" height="175" rx="20" fill="#f5f1ff" stroke="#7357c8" stroke-width="3"/>
     <text x="720" y="640" class="head">Session Workdir</text>
@@ -47,7 +47,7 @@
 
     <rect x="935" y="600" width="410" height="175" rx="20" fill="#fff6ed" stroke="#dc7b2a" stroke-width="3"/>
     <text x="1140" y="640" class="head">Artifact Repository + CAS</text>
-    <text x="1140" y="675" class="body">manifest · lock · sha256 payloads</text>
+    <text x="1140" y="675" class="body">manifest · sha256 payloads</text>
     <text x="1140" y="707" class="small">不可变 Artifact / immutable artifacts</text>
     <text x="1140" y="734" class="small">.lxp directory · .lxpz envelope</text>
   </g>

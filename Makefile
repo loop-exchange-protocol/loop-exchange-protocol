@@ -17,7 +17,7 @@ svg-check:
 	@python3 -c 'import sys,xml.etree.ElementTree as E; [E.parse(p) for p in sys.argv[1:]]' $$(find assets -type f -name '*.svg')
 
 stale-check:
-	@! grep -R -EIn --exclude='*.html' --exclude-dir='.git' 'github\.com/mobai|dark2momo|lxp-open|publish command|runtime bindings?|scripts/verify-local\.sh|go test \./\.\.\.|go vet \./\.\.\.' README*.md AGENTS*.md CONTRIBUTING*.md docs examples schemas .github
+	@! grep -R -EIn --exclude-dir='.git' 'github\.com/mobai|dark2momo|lxp-open|github\.com/loop-exchange-protocol/(go-sdk|go-provider-git)|git@v1|publish command|runtime bindings?|Provider Plan|materialization or activation|scripts/verify-local\.sh|go test \./\.\.\.|go vet \./\.\.\.' README*.md AGENTS*.md CONTRIBUTING*.md docs examples schemas dist .github
 
 ci: schema-check yaml-check shell-check docs-check svg-check stale-check
 	@git diff --check

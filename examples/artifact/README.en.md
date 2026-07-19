@@ -1,15 +1,14 @@
-# Artifact YAML example
+# ContextArtifact YAML example
 
-**English** | [中文主版本](README.md)
+[中文](README.md) | **English**
 
-The complete [manifest.yaml](manifest.yaml) and [lock.yaml](lock.yaml) demonstrate:
+[`manifest.yaml`](manifest.yaml) demonstrates the complete exchange structure:
 
-- Artifact coordinates and parent digest;
-- `git@v1` Provider identity and opaque `config`;
-- an embedded Git bundle and staged-state payload;
-- executable and credential Requirements;
-- lock binding of Provider contract, distribution, and revision.
+- readable Artifact coordinates and parent digest;
+- the global `loop.exchange:git:v1` Provider contract coordinate;
+- content-addressed payloads for an embedded Git base and selected index state;
+- media type, SHA-256 digest, and size.
 
-This static Artifact uses placeholder digests without object payloads, so it is intended for reading and Schema/validator tests rather than Import. The [Quickstart Harness](../quickstart/README.en.md) generates a real importable embedded Artifact and exposes its generated YAML under `/tmp/lxp-quickstart`.
+An Artifact has no `lock.yaml`: the manifest already fixes revision, distribution, and payload digests, and Artifact identity is the SHA-256 of validated raw `manifest.yaml` bytes, with no YAML canonicalization.
 
-Normal users do not hand-author this YAML. The CLI generates manifests, locks, and content-addressed objects.
+Normal users do not hand-author YAML. The CLI generates the manifest and `objects/sha256/` content.

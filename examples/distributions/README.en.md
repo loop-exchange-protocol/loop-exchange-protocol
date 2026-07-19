@@ -1,12 +1,12 @@
-# Reference and Mirrored YAML Examples
+# Distribution YAML examples
 
-**English** | [中文主版本](README.md)
+[中文](README.md) | **English**
 
-This directory provides complete manifest/lock structures for `reference` and `mirrored`:
+This directory provides two manifest structures:
 
-- [`reference-manifest.yaml`](reference-manifest.yaml) and [`reference-lock.yaml`](reference-lock.yaml): an immutable Git reference to Spring AI Examples with no `objects/` payload;
-- [`mirrored-manifest.yaml`](mirrored-manifest.yaml) and [`mirrored-lock.yaml`](mirrored-lock.yaml): one Spring AI revision represented by both a reference and embedded base fallback, with LFS pointer mode declared.
+- [`reference-manifest.yaml`](reference-manifest.yaml), an immutable Git reference to Spring AI Examples with no `objects/` payload;
+- [`mirrored-manifest.yaml`](mirrored-manifest.yaml), the same Spring AI reference revision with an embedded base fallback and declared LFS pointer mode.
 
-These files are Schema/canonical structure vectors, not directly importable `.lxpz` archives: the repository does not include the large Git bundle named by the sample mirrored payload digest. The executable four-Component journey lives in the [`go-provider-git` Harness](https://github.com/loop-exchange-protocol/go-provider-git/tree/main/harness/spring-ai-mcp).
+These are Schema/canonical structure vectors, not directly importable `.lxpz` archives, because the repository does not commit the large Git bundles they name. The executable four-Component journey lives in the [`provider-git` Harness](https://github.com/loop-exchange-protocol/provider-git/tree/main/harness/spring-ai-mcp).
 
-Key invariants are that both mirrored revisions are identical, lock distribution/revision/payload digests match the manifest, and reference locators contain neither credentials nor local paths. See the [Distribution guide](../../docs/distributions.en.md) for semantics.
+Both mirrored revisions are identical, manifest payload digest/size matches its object, and reference locators contain neither credentials nor local paths. There is no second Artifact lock. See the [Distribution guide](../../docs/distributions.en.md).

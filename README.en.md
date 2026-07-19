@@ -1,16 +1,14 @@
 # LXP — Loop Exchange Protocol
 
-**English** | [中文主版本](README.md)
+[中文](README.md) | **English**
 
-LXP is an open exchange protocol for agent working context. It adopts Git's mental model: import an immutable state, work and select changes in a worktree, then export a new snapshot linked to its parent.
+LXP is an open exchange protocol for agent work context. It uses a Git-like mental model: import immutable state, modify and select changes in a Workdir, then export a new Artifact linked to its parent.
 
 ```text
-Init/Import → Work → Add → Status → Export
-                         │             │
-                         └── Provider ─┘
+Import → Work → Add/Status → Export → Import …
 ```
 
-LXP is not a deployment template, package installer, or workflow language. YAML is the machine exchange format; the CLI is the normal interface. Production MVP Artifacts are content-addressed and immutable, while embedded provides standalone restore.
+LXP is not a deployment template, package installer, or command workflow. YAML is a machine exchange format; the daily entry point is the `lxp` CLI.
 
 ![LXP architecture](assets/lxp-architecture.svg)
 
@@ -18,74 +16,78 @@ LXP is not a deployment template, package installer, or workflow language. YAML 
 
 ## What Git-like means
 
-- `lxp import` restores an Artifact into a working Session.
-- `lxp add PATH...` resembles `git add`: delegate selection to the Provider that owns the path.
-- `lxp status` aggregates root ownership and Provider-native status.
-- `lxp export` resembles `git commit` plus portable packaging: read selected Provider state and create a new immutable Artifact.
-- `provenance.parent` links the previous Artifact digest into a linear history. Branch, merge, and rebase are outside `v1alpha1`.
+- `lxp import` reconciles an Artifact into a working Session; the same command retries failed state.
+- `lxp add PATH...` delegates selection to the deepest owning Provider; Git uses its index.
+- `lxp status` aggregates ownership and Provider-native changes.
+- `lxp export` reads selected state and creates a new immutable Artifact.
+- `provenance.parent` links the previous manifest digest into linear history. v1alpha1 defines no branch, merge, or rebase.
 
-The analogy stops at usage. The protocol permits different Provider types; the first Production MVP guarantees Git-repository Components only.
+LXP owns ownership; Providers own content. Component roots are unique and may form a strictly nested lexical tree. Each entity belongs to its deepest root and a parent excludes child subtrees. The protocol defines no symlink/copy/mount capability matrix; unsafe composition fails closed.
 
-## Core rules
+## Artifacts and extensions
 
-1. **LXP tracks ownership; Providers track content.** A Component is opaque to Core except for its direct child boundaries.
-2. Component roots are unique and may form a strictly nested lexical tree. Every entity path belongs only to its deepest root; ancestor Providers exclude child subtrees.
-3. `lxp add` normally invokes the deepest owning Provider. Native Provider discovery may perform contract-defined preparation and register explicit child roots as nested Components. `git@v1` initializes a missing submodule at its gitlink-locked revision.
-4. A Provider is identified by stable `provider + contract`; Provider-specific `config` is opaque to Core.
-5. The protocol defines no mount-capability or Provider-pair matrix. A Provider fails closed when a concrete parent/child path cannot be composed physically.
-6. Artifacts never carry executable Provider code. Import requires a preinstalled, trusted matching Provider contract and otherwise fails.
-7. Providers may materialize with symlinks, Git worktrees, copies, reflinks, or mounts. The protocol standardizes the result, not the mechanism.
-8. The Production MVP composes `git@v1` only, but fully supports reference, embedded, and mirrored `.lxpz` Artifacts; no matching Provider means failure.
+An Artifact contains only:
 
-The public CLI selects a form with `lxp export --distribution reference|embedded|mirrored` (default: embedded), and Import follows the Artifact declaration automatically. See the [Distribution guide](docs/distributions.en.md).
+```text
+manifest.yaml
+objects/sha256/<hex>
+```
 
-## Quick start
+There is no `lock.yaml`, and unknown files or orphan objects not referenced by the manifest are rejected. The manifest already fixes revisions, distributions, and payload digests. Artifact identity is the SHA-256 of validated raw `manifest.yaml` bytes; no YAML canonicalization is performed.
 
-The fastest route is the complete black-box quickstart:
+Providers and Checkers use `namespace:name:version` contract coordinates that are globally unique across kinds, such as `loop.exchange:git:v1`. An Artifact declares contracts only and carries no implementation package, repository URL, executable, or installation hook. Local [EngineConfig](examples/config/README.en.md) defines ordered repositories and contract-to-implementation bindings and exactly verifies registered implementations. The official CLI executes builtin Go implementations only and does not auto-install repository extensions.
 
-Install the `lxp` CLI from [`go-sdk`](https://github.com/loop-exchange-protocol/go-sdk), then pass it to the black-box Quickstart:
+The protocol is language-neutral, but the project maintains one official Go reference implementation and promises no multi-language SDK matrix:
+
+- [`lxp`](https://github.com/loop-exchange-protocol/lxp): SDK, Engine, and CLI;
+- [`provider-git`](https://github.com/loop-exchange-protocol/provider-git): `loop.exchange:git:v1`.
+
+## Production MVP
+
+The official composition contains only the Git Provider and fully supports reference, embedded, and mirrored `.lxpz`, defaulting to embedded. `lxp add` initializes a missing submodule at its gitlink-locked revision and recursively registers an independent Component without following newer remote revisions. Import Applies parent-to-child and preserves child roots while rebuilding a parent; Export validates gitlink/revision child-to-parent.
+
+Before Component writes, Import validates the Artifact, resolves all Providers/Checkers, checks consumed Requirements, and calls every Provider `Validate`. On Apply failure Core preserves the target and `importing` state with pinned extension resolution instead of global rollback. The same Artifact continues with the same implementations; retrying a ready Session is a no-op.
+
+## Quick experience
 
 ```bash
-go install github.com/loop-exchange-protocol/go-sdk/cmd/lxp@latest
+go install github.com/loop-exchange-protocol/lxp/cmd/lxp@latest
 LXP_BIN="$(command -v lxp)" examples/quickstart/run.sh
 ```
 
-It runs two real `init/import/add/status/export` generations, deletes the original worktree to prove standalone portability, and prints CLI-generated Artifact YAML. The shortest manual path is:
+Or run the short path manually:
 
 ```bash
 lxp init demo
 cd demo
 git clone YOUR_REPOSITORY source
-# Change content, then select only the Git changes to exchange:
+# Select only the Git changes to exchange
 lxp add source/PATH
 lxp export ../review-loop.lxpz
+
 cd ..
 lxp import review-loop.lxpz continued
 ```
 
-Within a Git Component, `lxp add` invokes the native Git index. A missing submodule is initialized at its gitlink-locked revision and recursively becomes a nested Git Component, but is never advanced automatically to a newer remote revision. Import and discovery use config-only `git submodule init` to keep parent native config consistent with a restored child, without fetching or checking out content. Export strictly verifies its parent gitlink against the child locked revision. An unowned path with no matching Provider fails. `lxp import` validates the Artifact, displays Provider actions, and checks Requirements before any side effect.
-
 ## Documentation
 
 - [v1alpha1 specification](docs/spec-v1alpha1.en.md) · [中文](docs/spec-v1alpha1.md)
-- [Production MVP Profile](docs/production-mvp.en.md) · [中文](docs/production-mvp.md)
-- [Go SDK and CLI](docs/go-engine.en.md) · [中文](docs/go-engine.md)
-- [Requirements](docs/requirements.en.md) · [中文](docs/requirements.md)
-- [Distribution guide](docs/distributions.en.md) · [中文](docs/distributions.md)
-- [v1alpha1 conformance matrix](docs/conformance.en.md) · [中文](docs/conformance.md)
-- [Ecosystem repository organization](docs/ecosystem.en.md) · [中文](docs/ecosystem.md)
-- [Git-like CLI example](examples/git-like/README.en.md) · [中文](examples/git-like/README.md)
-- [Complete executable quickstart](examples/quickstart/README.en.md) · [中文](examples/quickstart/README.md)
-- [Artifact YAML example](examples/artifact/README.en.md) · [中文](examples/artifact/README.md)
-- [Reference/Mirrored YAML examples](examples/distributions/README.en.md) · [中文](examples/distributions/README.md)
-- [Nested Component/Submodule YAML example](examples/submodules/README.en.md) · [中文](examples/submodules/README.md)
+- [Production MVP](docs/production-mvp.en.md) · [中文](docs/production-mvp.md)
+- [Go Engine and CLI](docs/go-engine.en.md) · [中文](docs/go-engine.md)
+- [Requirements/Checkers](docs/requirements.en.md) · [中文](docs/requirements.md)
+- [Distributions](docs/distributions.en.md) · [中文](docs/distributions.md)
+- [Conformance](docs/conformance.en.md) · [中文](docs/conformance.md)
+- [Ecosystem repositories](docs/ecosystem.en.md) · [中文](docs/ecosystem.md)
+- [Quickstart](examples/quickstart/README.en.md) · [中文](examples/quickstart/README.md)
+- [Artifact YAML](examples/artifact/README.en.md) · [中文](examples/artifact/README.md)
+- [EngineConfig YAML](examples/config/README.en.md) · [中文](examples/config/README.md)
 - [ContextArtifact Schema](schemas/v1alpha1/context-artifact.schema.json)
-- [Artifact Lock Schema](schemas/v1alpha1/artifact-lock.schema.json)
-- [Standalone HTML overview](dist/import-export-protocol.html)
+- [EngineConfig Schema](schemas/v1alpha1/engine-config.schema.json)
+- [HTML overview](dist/import-export-protocol.html)
 
-## Alpha and trust boundary
+## Alpha and security boundary
 
-`loop.exchange/v1alpha1` is a public alpha with **no forward or backward compatibility promise**. It is limited to trusted Artifacts. Schema, path, and digest validation plus explicit execution policy are defense in depth, not a complete security boundary for hostile input.
+`loop.exchange/v1alpha1` is a public alpha with no compatibility promise and is limited to trusted Artifacts. Schema checks, safe paths, digest verification, and explicit execution policy are defense in depth, not a complete hostile-input boundary.
 
 ```bash
 make ci

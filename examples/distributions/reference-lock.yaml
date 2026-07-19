@@ -1,9 +1,0 @@
-api_version: loop.exchange/v1alpha1
-artifact: sha256:7d1c41f69dccc8dc9609d5c6ec667fc28ed1045530dea52a4d78cbd3ab245c49
-components:
-  - id: spring-ai-examples
-    path: projects/spring-ai-examples
-    provider: git
-    contract: v1
-    distribution: reference
-    revision: 74164123ba2d13cba7ae185a460b133914106b69

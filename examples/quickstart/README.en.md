@@ -17,7 +17,7 @@ LXP_BIN="$(command -v lxp)" examples/quickstart/run.sh
 
 The script verifies three important semantics:
 
-- `lxp add source/README.md` discovers `source/.git` upward, registers the repository as `git@v1`, and selects only the requested change;
+- `lxp add source/README.md` discovers `source/.git` upward, registers the repository as `loop.exchange:git:v1`, and selects only the requested change;
 - Git-untracked `draft.txt` is not silently exported, and Git index selection remains staged after Import;
 - after deleting the publisher and generation 1, a standalone embedded Artifact still imports and continues through `provenance.parent` into generation 2.
 

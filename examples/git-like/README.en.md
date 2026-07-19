@@ -5,7 +5,7 @@
 This example uses only the normal CLI and requires no hand-authored protocol YAML:
 
 ```bash
-go install github.com/loop-exchange-protocol/go-sdk/cmd/lxp@latest
+go install github.com/loop-exchange-protocol/lxp/cmd/lxp@latest
 LXP_BIN="$(command -v lxp)"
 "$LXP_BIN" init /tmp/lxp-demo
 cd /tmp/lxp-demo

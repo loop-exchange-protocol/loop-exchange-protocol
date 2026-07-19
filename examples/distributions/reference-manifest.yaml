@@ -8,8 +8,10 @@ coordinates:
 components:
   - id: spring-ai-examples
     path: projects/spring-ai-examples
-    provider: git
-    contract: v1
+    provider:
+      namespace: loop.exchange
+      name: git
+      version: v1
     distribution: reference
     reference:
       locator: https://github.com/spring-projects/spring-ai-examples.git

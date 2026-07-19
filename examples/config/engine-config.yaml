@@ -1,0 +1,29 @@
+api_version: loop.exchange/v1alpha1
+kind: EngineConfig
+repositories:
+  - id: company
+    url: https://packages.example.com/lxp
+    credential: company-packages
+bindings:
+  - kind: provider
+    contract:
+      namespace: loop.exchange
+      name: git
+      version: v1
+    implementation:
+      source: builtin
+      package:
+        namespace: loop.exchange
+        name: provider-git
+        version: 0.1.0-alpha.3
+  - kind: checker
+    contract:
+      namespace: loop.exchange
+      name: executable
+      version: v1
+    implementation:
+      source: builtin
+      package:
+        namespace: loop.exchange
+        name: checker-executable
+        version: 0.1.0-alpha.3

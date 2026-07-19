@@ -2,40 +2,35 @@
 
 [English](ecosystem.en.md) | **中文主版本**
 
-LXP 的规范、Schema、权威文档、案例和一致性要求同源；SDK 按语言发布；Provider 按“语言 × 领域”独立发布，以保留清晰的发布周期、依赖边界和贡献归属。
+LXP 采用“语言无关规范 + 一套官方参考实现 + 按领域拆分 Provider”，而不是多语言 SDK 矩阵。实现语言是技术选择，不进入仓库或 contract 名称。
 
 GitHub Organization：[`loop-exchange-protocol`](https://github.com/loop-exchange-protocol)。
 
 ```text
 loop-exchange-protocol/
-├── loop-exchange-protocol # 唯一规范源、文档、Schema、案例与 Conformance 要求
-├── go-sdk                 # Go SDK、Engine 与官方 lxp CLI
-├── go-provider-git        # Go Git Provider
-└── go-provider-local      # 实验性 Go file@v1 与 filesystem@v1 Providers
+├── loop-exchange-protocol # 规范、文档、Schema、案例与 Conformance
+├── lxp                    # 官方 Go SDK、Engine 与 CLI
+└── provider-git           # 官方 Git Provider
 ```
 
 ## 仓库边界
 
 ### loop-exchange-protocol
 
-协议文本、JSON Schemas、中英权威文档、canonical YAML、完整用户案例和 SDK-neutral Conformance 要求。它不包含特定语言实现，也不把文档拆到另一个仓库，避免规范漂移。
+唯一语言无关规范源，包含 JSON Schema、中英文文档、canonical YAML、设计图和 Conformance 要求。它不包含实现代码，也不把文档拆到另一个仓库。
 
-### go-sdk
+### lxp
 
-Go 类型、Provider 接口、Engine 与官方 CLI。CLI 是各 Provider 的 composition root；SDK Core 不导入具体 Provider。只有真正出现第二语言实现时才建立对应 SDK 仓库。
+官方参考实现，当前使用 Go，包含类型、Provider/Checker 接口、Engine、Artifact codec 与 `cmd/lxp`。仓库不再叫 `go-sdk`，因为项目没有维护 Java/Rust/Python SDK 系列的承诺，而且该仓库不只是 SDK。
 
-### go-provider-git
+### provider-git
 
-实现 `git@v1`。它拥有 Git discovery、selection、materialization、export 与 restore 语义，独立记名和发布。
+实现全局 contract `loop.exchange:git:v1`，拥有 Git discovery、index selection、幂等 Apply、三种 distribution 与 submodule boundary 语义。仓库不带语言前缀；Go 是当前实现技术，不是协议身份。
 
-### go-provider-local
+旧 `go-provider-local` 已归档。File/Filesystem 不属于 Git-only Production MVP，不继续制造正式生态承诺。
 
-实验性实现 `file@v1` 与 `filesystem@v1`。二者共享本地路径、symlink 与 archive 安全模型，因此保持同仓库；它们不注入官方 CLI，也不属于 Production MVP conformance。
+## 扩展分发与贡献归属
 
-## 案例与一致性
+第三方 Provider/Checker 以全局 `namespace:name:version` contract 标识，并按独立领域仓库维护 credit、发布周期与安全责任。Artifact 只声明 contract；消费端 EngineConfig 配置仓库和 contract→implementation binding。官方 CLI 暂时只执行 builtin，不自动安装 repository package。
 
-案例保留在本仓库 `examples/`，与其解释的规范和 YAML 同步。可执行 Harness 可由 SDK 仓库消费，但 `docs/conformance.md` 和 `schemas/` 始终是权威来源。第三方实现只有通过适用 profile 才能声明 conformant。
-
-Provider Registry 等到第三方数量产生真实的发现、签名、撤回和版本治理需求后再建立。Public alpha 不维护空壳 Registry。
-
-拆分不得复制规范源。实现仓库只能链接或消费带版本的规范；`loop.exchange/v1alpha1` 不承诺兼容性，当前仅面向可信 Artifact。
+案例保留在本规范仓库，与 Schema 同步；可执行 Harness 位于实现仓库。第三方实现只有通过适用 Conformance Profile 才能声明兼容。`v1alpha1` 不承诺兼容性，当前只面向可信 Artifact。

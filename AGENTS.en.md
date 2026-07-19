@@ -17,17 +17,18 @@ make ci
 - The lifecycle is `Import → Work → Add/Status → Export`; every Export creates a new immutable Artifact.
 - LXP owns routing and Providers own content. Component roots are unique and may form a strictly nested lexical tree; every entity path belongs only to its deepest root.
 - `lxp add` routes to the deepest owning Provider. Native discovery may register nested Components; ancestor Providers exclude child subtrees and fail when composition is unsafe.
-- Providers use stable `provider + contract` identity; Provider config and payloads are opaque to Core.
+- Providers and Checkers use `namespace:name:version` contract coordinates that are globally unique across kinds. Artifacts declare contracts only; ordered consumer-local repositories and bindings resolve implementations and exactly verify registered implementation packages.
 - Artifacts carry no executable Provider code; unknown or mismatched contracts fail.
 - Exchange state contains logical identities and SHA-256 payloads, never local materialization or Provider Store paths.
 - A standalone embedded Artifact imports without original sources or exporter Engine state.
-- Secrets never enter manifests, locks, payloads, argv, or logs. Executable and MCP actions require explicit authorization.
+- An Artifact contains only its manifest and referenced content-addressed payloads; unknown files, orphan objects, and redundant `lock.yaml` are rejected. Secrets never enter manifests, payloads, argv, or logs. Executable and MCP Checks require explicit authorization.
 - CLI/Provider external operations inherit a cancellable execution context with a deadline, never wait for interactive credentials, and bound diagnostic output.
 - Unowned, non-ignored paths block Export. Git-untracked content is never exported silently.
-- During `lxp add`, `git@v1` initializes each missing submodule at its gitlink-locked revision and recursively registers it as an independent nested Component; it never advances an initialized submodule to a newer remote revision. Import and discovery use config-only `git submodule init` to keep parent native config consistent with a restored child, without fetching or checking out content. Export validates gitlink/revision from child to parent; Import restores parent to child and rejects symlink/non-empty collisions.
-- `git@v1` applies the same 256 MiB embedded staged-patch limit at Export and Import; Export cannot create an Artifact this contract cannot restore.
+- During `lxp add`, `loop.exchange:git:v1` initializes each missing submodule at its gitlink-locked revision and recursively registers it as an independent nested Component; it never advances an initialized submodule to a newer remote revision. Import and discovery use config-only `git submodule init` to keep parent native config consistent with a restored child, without fetching or checking out content. Export validates gitlink/revision child-to-parent; Import Applies parent-to-child.
+- Provider `Apply` is idempotent and retryable without Core rollback. A failed Import keeps local `importing` state and pinned extension resolution for the same Artifact, successful Components are not rolled back, and retrying a ready Session is a no-op.
+- `loop.exchange:git:v1` applies the same 256 MiB embedded staged-patch limit at Export and Import; Export cannot create an Artifact this contract cannot restore.
 - Conversations may continue; execution replay is unsupported.
 
 `v1alpha1` is a public alpha with no compatibility promise and is limited to trusted Artifacts. Validation, digest verification, and execution policy are not a complete security boundary for hostile input.
 
-The Production MVP is a constrained specification subset: the official composition includes `git@v1` only, the public CLI is limited to `init/add/status/export/import/inspect/requirements`, and it accepts `reference`, `embedded`, and `mirrored` `.lxpz` Artifacts. `lxp export --distribution` selects the form and defaults to `embedded`; Import follows the Artifact declaration. `Plan` is internal Import preflight; File/Filesystem Providers and Template repositories are outside the production claim.
+The Production MVP is a constrained specification subset: the official composition contains only the built-in Go `loop.exchange:git:v1` implementation and promises no multi-language SDK matrix. The public CLI is limited to `init/add/status/export/import/inspect/requirements` and accepts `reference`, `embedded`, and `mirrored` `.lxpz` Artifacts. `lxp export --distribution` selects the form and defaults to `embedded`; Import follows the Artifact declaration. Automatic extension installation, File/Filesystem Providers, and Template repositories are outside the production claim.

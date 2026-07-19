@@ -9,8 +9,10 @@ components:
   - id: application
     description: Parent repository; owns .gitmodules and the gitlink boundary.
     path: repositories/application
-    provider: git
-    contract: v1
+    provider:
+      namespace: loop.exchange
+      name: git
+      version: v1
     distribution: mirrored
     reference:
       locator: https://example.invalid/application.git
@@ -25,8 +27,10 @@ components:
   - id: shared-library
     description: Child repository; owns every entity below its nested root.
     path: repositories/application/deps/shared-library
-    provider: git
-    contract: v1
+    provider:
+      namespace: loop.exchange
+      name: git
+      version: v1
     distribution: embedded
     embedded:
       revision: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb

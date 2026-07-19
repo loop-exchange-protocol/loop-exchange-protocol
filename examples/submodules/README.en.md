@@ -10,7 +10,7 @@
 - Import materializes parent to child; Export locks child to parent and validates the boundary.
 - The Artifact declares no copy, symlink, or mount capability. A Provider fails when it cannot safely compose the concrete path.
 
-The YAML uses placeholder digests and sizes to emphasize structure and omits large Git bundles. The real CLI generates the manifest, payloads, and lock automatically:
+The YAML uses placeholder digests and sizes to emphasize structure and omits large Git bundles. The real CLI generates the manifest and payloads automatically:
 
 ```bash
 git clone YOUR_REPOSITORY source

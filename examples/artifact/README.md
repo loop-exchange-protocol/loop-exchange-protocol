@@ -1,15 +1,14 @@
-# Artifact YAML 示例
+# ContextArtifact YAML 案例
 
 [English](README.en.md) | **中文主版本**
 
-这里提供完整的 [manifest.yaml](manifest.yaml) 与 [lock.yaml](lock.yaml)，用于展示协议交换格式。它们覆盖：
+[`manifest.yaml`](manifest.yaml) 展示完整协议交换结构，包括：
 
-- Artifact coordinates 与父 digest；
-- `git@v1` Provider identity 和不透明 `config`；
-- embedded Git bundle 与 staged-state payload；
-- executable 与 credential Requirements；
-- lock 对 Provider contract、distribution 与 revision 的绑定。
+- 可读 Artifact coordinates 与 parent digest；
+- 全局 `loop.exchange:git:v1` Provider contract 坐标；
+- embedded Git base 与 selected index state 的 content-addressed payload；
+- media type、SHA-256 digest 与 size。
 
-这个静态 Artifact 使用占位 digest 且不附带 objects，因此用于阅读和 Schema/validator 测试，不用于 Import。真正可导入的 embedded Artifact 由 [Quickstart Harness](../quickstart/README.md) 实时生成；运行后可直接查看 `/tmp/lxp-quickstart/generation-2.manifest.yaml`。
+Artifact 不包含 `lock.yaml`：revision、distribution 与 payload digest 已由 manifest 唯一固定，Artifact identity 直接计算验证通过的 `manifest.yaml` 原始 bytes 的 SHA-256，不执行 YAML canonicalization。
 
-普通用户不需要手写这些 YAML。CLI 负责生成 manifest、lock 和 content-addressed objects。
+普通用户无需手写 YAML。CLI 生成 manifest 与 `objects/sha256/` 内容。
