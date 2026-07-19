@@ -45,6 +45,7 @@ lxp requirements [--format tui|json] ARTIFACT.lxpz
 - Embedded 和 mirrored fallback 的 Git bundle 只覆盖当前 `HEAD` 可达历史；仅 embedded 可附带 staged binary patch。
 - Embedded 与 mirrored 在删除 exporter state 和原始 repository 后仍必须恢复；reference source 不可用时必须失败并清理 target。
 - Embedded 的 Git index selection 必须在 Import 后保持 staged；reference/mirrored 要求 Export 时 index 与 `HEAD` 一致。Git-untracked 与未选择的 tracked changes 不得进入 Artifact。
+- Embedded staged patch 的未压缩 `diff.patch` 上限为 256 MiB；Export 与 Import MUST 使用同一上限。超限 Export 必须在发布 Artifact 前失败。
 - Artifact identity 是 `manifest.yaml` 原始 bytes 的 SHA-256；coordinates 只是人类可读标签，不是身份。
 - 每次成功 Export 更新当前 Session 的 parent digest；下一代 manifest 必须引用它。
 
@@ -59,7 +60,9 @@ Import 按父到子恢复：父 checkout 只能给 child 留下 absent 或 empty
 - Import target 必须不存在；失败 Import 必须清理新建 target。
 - 所有 payload 在 Provider 调用前验证 SHA-256 与 size；Provider 必须验证 payload role 和 media type。
 - 未知 Provider、contract mismatch、distribution mismatch、额外 payload role、Requirement failure 或非 portable Git feature 必须 fail closed。
-- 一个 Session 是 single-writer；调用方必须串行执行 `add` 与 `export`。本 Profile 不承诺并发写入协调。
+- CLI 的 Provider/external operation 默认具有有限 deadline，并响应调用方取消；当前默认 15 分钟，可由 `LXP_TIMEOUT` 正数 Go duration 覆盖。Git 子进程继承该 Context；SDK 调用方未提供 deadline 时，`git@v1` 使用 5 分钟默认值。Terminal、askpass 与 Git Credential Manager interactive prompt 必须禁用；无非交互 credential 时立即失败或在 deadline 内失败。
+- Workdir、Session discovery 与 CLI path 参数在本地 containment/relative 运算前必须解析既有 symlink prefix，使用同一物理绝对路径；这覆盖 macOS `/var` 与 `/private/var` alias，且物理路径仍不得进入 Artifact。
+- 一个 Session 是 single-writer；调用方必须串行执行 `add` 与 `export`。本 Profile 不要求进程锁，也不承诺并发写入协调。
 
 ## 明确非目标
 
@@ -69,8 +72,8 @@ Import 按父到子恢复：父 checkout 只能给 child 留下 absent 或 empty
 
 实现发布 Production MVP 前必须通过：
 
-1. Go unit、race 与 vet；
+1. Linux 与 macOS 公开 CI 上的 Go unit、race 与 vet；
 2. Git Provider contract 的正向与负向测试；
 3. reference 在线/离线与 mirrored fallback Harness，以及删除 exporter/source 后的 embedded 两代 Export/Import Harness；
-4. digest、size、archive traversal、duplicate entry、symlink、nested collision、未注册 submodule、gitlink revision mismatch、filter 和 contract mismatch 测试；
+4. digest、size、archive traversal、duplicate entry、symlink、nested collision、未注册 submodule、gitlink revision mismatch、filter、staged patch 双向上限、external-command cancellation、non-interactive credential 与 contract mismatch 测试；
 5. 中英文规范、Schema、canonical YAML、HTML 与 CLI help 一致性检查。

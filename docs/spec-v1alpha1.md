@@ -62,6 +62,7 @@ components:
 - Engine 只拥有 root、identity、Provider routing、Requirements 与交换 envelope。
 - 除已声明的 direct child roots 外，Component 内部对 Core MUST opaque。实体 path 由包含它的最深 Component root 唯一拥有；祖先 Provider MUST 排除所有 direct child subtrees，无法安全排除时 MUST 失败。
 - Core MUST NOT 规定 symlink、copy、mount 或 Provider 组合矩阵，也不得把本地物化能力写入 Artifact。父子物理组合由本地 Provider 判断；不兼容 MUST fail closed。
+- Wire path 仍按 normalized lexical path 定义；但本地 Engine 在执行 containment、relative path 或 Session discovery 前，MUST 把绝对路径的既有 symlink prefix 解析为同一物理路径，避免一个 Workdir 因本机 alias 被识别为两个 root。解析结果不得进入 Artifact。
 - Core MAY 在 Add 时调用 owning Provider 的 native child discovery。Provider MAY 按 contract 执行使明确 direct child root 可独立匹配所需的 bounded preparation；该行为必须由 contract 公开，且 unsafe collision 或 preparation failure 必须在注册前失败。发现的 child 必须注册为独立 Component；未知 marker 不得被 Core 猜测。
 - 普通 path 操作 MUST 路由给最深 owning Provider。“从哪里来就到哪里去，原来谁管就交回谁管”。父 Provider 可另外维护 gitlink 等只属于边界的 native attachment metadata，但不得读取或导出 child 实体内容。
 
@@ -83,6 +84,8 @@ Provider contract 包含：
 - `ExportComponent`：产生 immutable reference、embedded payload 或两者。
 
 Artifact MUST NOT 携带 Provider executable、plugin binary 或安装 hook。Importer MUST 只使用本地预装且受信任的匹配 contract；缺失或版本不匹配 MUST 失败，不得降级或要求 Agent 猜测迁移。
+
+可能访问外部服务或启动 executable 的 Provider 操作 MUST 继承调用方的 cancellation/deadline；调用方没有 deadline 时，实现 MUST 使用有限默认值。Provider MUST NOT 请求 interactive credential，且 diagnostic output MUST 有界并继续遵守 secret 不落盘/不进 log 的规则。
 
 Provider MAY 使用 symlink、Git worktree、copy、reflink、mount 等机制。LXP 只规范声明路径上的语义结果，不规范本地实现机制；任何本地目标路径、socket、PID、port、credential handle 或 Provider Store path MUST NOT 进入 Artifact。
 

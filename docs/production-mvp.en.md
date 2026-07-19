@@ -45,6 +45,7 @@ lxp requirements [--format tui|json] ARTIFACT.lxpz
 - Embedded and mirrored fallbacks carry a Git bundle limited to history reachable from the current `HEAD`; only embedded may include a staged binary patch.
 - Embedded and mirrored restore after exporter state and source repositories are deleted. Reference fails and cleans its target when the source is unavailable.
 - Embedded Git index selection remains staged after Import. Reference and mirrored require the index to match `HEAD` at Export. Git-untracked and unselected tracked changes do not enter the Artifact.
+- The uncompressed embedded staged `diff.patch` is limited to 256 MiB, and Export and Import MUST use the same limit. An oversized Export fails before publishing an Artifact.
 - Artifact identity is the SHA-256 of the exact `manifest.yaml` bytes; coordinates are human-readable labels, not identity.
 - Every successful Export advances the current Session parent digest; the next manifest references it.
 
@@ -59,7 +60,9 @@ Import restores parent before child: a parent checkout may leave only an absent 
 - An Import target must not exist; a failed Import removes the newly created target.
 - Every payload is checked for SHA-256 and size before a Provider call; Providers validate payload roles and media types.
 - Unknown Providers, contract mismatches, distribution mismatches, extra payload roles, Requirement failures, and non-portable Git features fail closed.
-- A Session is single-writer. Callers serialize `add` and `export`; this Profile does not promise concurrent-writer coordination.
+- CLI Provider/external operations have a finite default deadline and honor caller cancellation. The current default is 15 minutes and a positive Go duration in `LXP_TIMEOUT` overrides it. Git subprocesses inherit that Context; when an SDK caller supplies no deadline, `git@v1` applies a five-minute default. Terminal, askpass, and Git Credential Manager interactive prompts are disabled; absent non-interactive credentials fail immediately or within the deadline.
+- Workdir, Session discovery, and CLI path arguments resolve existing symlink prefixes to one physical absolute path before local containment or relative-path operations. This covers the macOS `/var` and `/private/var` alias; physical paths still cannot enter an Artifact.
+- A Session is single-writer. Callers serialize `add` and `export`; this Profile requires no process lock and promises no concurrent-writer coordination.
 
 ## Explicit non-goals
 
@@ -69,8 +72,8 @@ This Profile provides no remote Registry, coordinate install/resolve, Template-r
 
 Before claiming the Production MVP, an implementation passes:
 
-1. Go unit, race, and vet checks;
+1. Go unit, race, and vet checks in public Linux and macOS CI;
 2. positive and negative Git Provider contract tests;
 3. online/offline reference and mirrored-fallback Harnesses, plus a two-generation embedded Export/Import Harness after deleting exporter/source state;
-4. digest, size, traversal, duplicate-entry, symlink, nested-collision, unregistered-submodule, gitlink-revision-mismatch, filter, and contract-mismatch tests;
+4. digest, size, traversal, duplicate-entry, symlink, nested-collision, unregistered-submodule, gitlink-revision-mismatch, filter, symmetric staged-patch limits, external-command cancellation, non-interactive credentials, and contract-mismatch tests;
 5. consistency checks across bilingual specifications, Schemas, canonical YAML, HTML, and CLI help.

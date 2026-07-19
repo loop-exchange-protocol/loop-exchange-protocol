@@ -62,6 +62,7 @@ Normative invariants:
 - Engine owns roots, identities, Provider routing, Requirements, and the exchange envelope.
 - Except for declared direct child roots, a Component remains opaque to Core. Every entity path is owned by its deepest containing Component root. An ancestor Provider MUST exclude every direct child subtree and MUST fail when it cannot do so safely.
 - Core MUST NOT standardize symlink, copy, mount, or Provider-pair compatibility, and local materialization capabilities MUST NOT enter the Artifact. Local Providers decide whether a parent and child can be composed physically and fail closed when they cannot.
+- Wire paths remain normalized lexical paths. Before local containment, relative-path, or Session-discovery operations, however, an Engine MUST resolve existing symlink prefixes of absolute paths to one physical path so a host alias cannot make one Workdir appear as two roots. The resolved local path cannot enter an Artifact.
 - During Add, Core MAY invoke native child discovery on the owning Provider. A Provider MAY perform contract-defined bounded preparation required to make an explicit direct child root independently matchable; the contract must disclose that behavior, and an unsafe collision or preparation failure must fail before registration. A discovered child is registered as an independent Component; Core cannot guess unknown markers.
 - Ordinary path operations route to the deepest owning Provider. A parent Provider may additionally maintain Provider-native attachment metadata such as a gitlink at the boundary, but cannot read or export child entity content.
 
@@ -72,6 +73,8 @@ Provider identity consists of a stable `provider` ID and `contract` version. Pro
 A Provider contract contains `Match`, `Resolve`, `Materialize`, `Restore`, `Plan`, `Add`, `Status`, `Activate`, and `ExportComponent`. It MAY implement `DiscoverChildren` to prepare and return independently registrable Provider-native direct child roots, and `TrackChild` for parent boundary metadata after child selection. Plan exposes Requirements, actions, and security effects before execution. Add and Status implement native change-selection semantics.
 
 Artifacts MUST NOT carry Provider executables, plugin binaries, or install hooks. Import MUST use a preinstalled, trusted, exactly matching contract and otherwise fail. Silent downgrade and Agent-inferred migration are forbidden.
+
+A Provider operation that may access an external service or launch an executable MUST inherit caller cancellation and deadlines; when the caller provides no deadline, the implementation MUST apply a finite default. Providers MUST NOT request interactive credentials, diagnostic output MUST be bounded, and the no-secret-in-files-or-logs rule still applies.
 
 Providers MAY materialize using symlinks, Git worktrees, copies, reflinks, mounts, or another local mechanism. LXP standardizes the semantic result at the declared path, not the mechanism. Local target paths, sockets, PIDs, ports, credential handles, and Provider Store paths MUST NOT enter an Artifact.
 

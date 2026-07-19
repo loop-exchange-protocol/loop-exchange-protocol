@@ -46,6 +46,7 @@ The fastest route is the complete black-box quickstart:
 Install the `lxp` CLI from [`go-sdk`](https://github.com/loop-exchange-protocol/go-sdk), then pass it to the black-box Quickstart:
 
 ```bash
+go install github.com/loop-exchange-protocol/go-sdk/cmd/lxp@latest
 LXP_BIN="$(command -v lxp)" examples/quickstart/run.sh
 ```
 

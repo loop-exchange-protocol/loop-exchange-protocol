@@ -22,8 +22,10 @@ make ci
 - Exchange state contains logical identities and SHA-256 payloads, never local materialization or Provider Store paths.
 - A standalone embedded Artifact imports without original sources or exporter Engine state.
 - Secrets never enter manifests, locks, payloads, argv, or logs. Executable and MCP actions require explicit authorization.
+- CLI/Provider external operations inherit a cancellable execution context with a deadline, never wait for interactive credentials, and bound diagnostic output.
 - Unowned, non-ignored paths block Export. Git-untracked content is never exported silently.
 - During `lxp add`, `git@v1` initializes each missing submodule at its gitlink-locked revision and recursively registers it as an independent nested Component; it never advances an initialized submodule to a newer remote revision. Export validates gitlink/revision from child to parent; Import restores parent to child and rejects symlink/non-empty collisions.
+- `git@v1` applies the same 256 MiB embedded staged-patch limit at Export and Import; Export cannot create an Artifact this contract cannot restore.
 - Conversations may continue; execution replay is unsupported.
 
 `v1alpha1` is a public alpha with no compatibility promise and is limited to trusted Artifacts. Validation, digest verification, and execution policy are not a complete security boundary for hostile input.

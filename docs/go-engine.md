@@ -5,6 +5,12 @@
 官方 Go Production MVP 由 [`go-sdk`](https://github.com/loop-exchange-protocol/go-sdk) 与 [`go-provider-git`](https://github.com/loop-exchange-protocol/go-provider-git) 组成。SDK Core 不内置具体 Provider；官方 CLI 只注入 `git@v1`。本页是非规范性指引，承诺边界见 [Production MVP Profile](production-mvp.md)。
 
 ```bash
+go install github.com/loop-exchange-protocol/go-sdk/cmd/lxp@latest
+```
+
+CLI 位于独立 `cmd/lxp` Go module，release tag 使用 `cmd/lxp/vX.Y.Z`；module 依赖已发布 SDK/Provider 版本，不包含阻断 `go install ...@latest` 的 `replace`。
+
+```bash
 lxp init work
 git clone YOUR_REPOSITORY work/source
 cd work
@@ -30,7 +36,7 @@ lxp import context.lxpz continued
 
 `lxp export --distribution` 支持 `reference`、`embedded` 与 `mirrored`，省略时默认 embedded。`lxp import` 不需要 distribution flag，直接按 Artifact manifest 自动处理。成功 Export 推进 Session parent，下一代 Artifact 自动写入 `provenance.parent`。
 
-Embedded 使用当前 `HEAD` 的最小 Git bundle 加可选 staged binary patch，Import 不联系原 remote，并恢复 Git index selection。Reference 使用安全 network locator + 完整 commit ID。Mirrored 先尝试相同 revision 的 reference，source 不可用时清理部分 target，再从 embedded base 恢复。Reference/mirrored 要求 index 与 `HEAD` 一致，不能运输 staged patch。
+Embedded 使用当前 `HEAD` 的最小 Git bundle 加可选 staged binary patch，Import 不联系原 remote，并恢复 Git index selection。未压缩 staged `diff.patch` 的 Export/Import 上限同为 256 MiB，超限 Export 在 Artifact 发布前失败。Reference 使用安全 network locator + 完整 commit ID。Mirrored 先尝试相同 revision 的 reference，source 不可用时清理部分 target，再从 embedded base 恢复。Reference/mirrored 要求 index 与 `HEAD` 一致，不能运输 staged patch。
 
 为保证 portable 语义，Git Provider 拒绝 shallow repository、无法安全初始化或未注册的 submodule、gitlink 与 child revision 不一致、cross-symlink nested root 和 escaping symlink；embedded 还拒绝 clean/smudge filter。Submodule 是独立 Component，父 bundle 不包含子 objects；Import 父到子恢复，Export 子到父验证。Reference/mirrored 的 LFS pointer 模式不执行 filter，外部 LFS object 不进入 Artifact。Artifact output 不覆盖现有路径；Import target 必须不存在，失败时清理新 target。
 
@@ -42,6 +48,10 @@ lxp add source
 ```
 
 自动初始化只 checkout 每个 gitlink 当前锁定的 commit，不等同于 `git submodule update --remote`。Symlink/non-empty target collision、不可访问 locator 或 checkout 失败都会使 Add 失败。
+
+CLI 外部操作默认 15 分钟 timeout，可用 `LXP_TIMEOUT=30m` 等正数 Go duration 覆盖。所有 Git 子进程继承该 Context；Provider 在 SDK 调用方没有 deadline 时使用 5 分钟默认值。Git terminal/askpass/GCM interactive prompt 被禁用，认证需预先由非交互 credential helper 或 SSH agent 提供。
+
+Session 与 CLI path 在本地比较前解析既有 symlink prefix 为物理绝对路径。因而 macOS 上从 `/var/...` 初始化、再从 `/private/var/...` 工作仍属于同一 Workdir，无需改写 `TMPDIR` 绕过。
 
 修改子仓库后，`lxp add source/PATH/IN/SUBMODULE` 选择 child index；子仓库产生新 commit 后，`lxp add source/PATH/TO/SUBMODULE` 同时让 child Provider 处理 root 并同步父 index 的 gitlink。
 

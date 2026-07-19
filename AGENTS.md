@@ -22,8 +22,10 @@ make ci
 - 交换对象只包含逻辑身份与 SHA-256 payload，不包含本地物化路径或 Provider Store path。
 - Standalone embedded Artifact import 不依赖原始 source 或 exporter Engine state。
 - Secret 值不得进入 manifest、lock、payload、argv 或 log；Executable/MCP action 必须显式授权。
+- CLI/Provider 外部操作必须继承可取消且有 deadline 的执行上下文，不得交互式等待 credential；诊断输出必须有界。
 - 未归属且未忽略的 path 会阻止 Export；Git-untracked 内容不得静默导出。
 - `git@v1` 在 `lxp add` 时按 gitlink 锁定 revision 自动初始化缺失 submodule，并递归注册为独立嵌套 Component；不得把已初始化 submodule 更新到远端新 revision。Export 子到父验证 gitlink/revision，Import 父到子恢复且拒绝 symlink/non-empty collision。
+- `git@v1` embedded staged patch 的 Export/Import 上限同为 256 MiB；Export 不得创建本 contract 无法恢复的 Artifact。
 - Conversation 可以 continue，但不支持 execution replay。
 
 `v1alpha1` 是不承诺兼容性的 public alpha，只面向可信 Artifact。Validation、digest verification 与 execution policy 不是处理恶意输入的完整安全边界。
