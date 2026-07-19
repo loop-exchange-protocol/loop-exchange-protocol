@@ -33,7 +33,7 @@ lxp requirements [--format tui|json] ARTIFACT.lxpz
 - 官方组合只包含 `git@v1`；没有隐式 File/Filesystem fallback。
 - 当前 `git@v1` 实现要求本机预装受信任的 Git CLI；这是 Provider 安装前提，不是 Artifact 内携带的 executable。
 - 未归属 path 没有 Provider 匹配时，`lxp add` 和 Export 必须失败。
-- 每个 Git repository 是独立 Component；已初始化的 Git submodule 递归注册为嵌套 `git@v1` Component。父仓库只拥有 `.gitmodules` 与 gitlink boundary，子仓库拥有其工作树实体。
+- 每个 Git repository 是独立 Component；`lxp add` 按 index gitlink 发现 submodule，缺失 worktree 自动 checkout 锁定 commit，并递归注册为嵌套 `git@v1` Component。父仓库只拥有 `.gitmodules` 与 gitlink boundary，子仓库拥有其工作树实体。
 - Conversation、Skill、结果文件或其他上下文若需进入 MVP Artifact，必须位于被 Git Provider 管理的 repository 中并由 Git index 选择。
 - 协议仍保留第三方 Provider 扩展点，但不属于本 Profile 的生产承诺。
 
@@ -48,9 +48,9 @@ lxp requirements [--format tui|json] ARTIFACT.lxpz
 - Artifact identity 是 `manifest.yaml` 原始 bytes 的 SHA-256；coordinates 只是人类可读标签，不是身份。
 - 每次成功 Export 更新当前 Session 的 parent digest；下一代 manifest 必须引用它。
 
-`git@v1` Production Export 拒绝 shallow repository、未初始化或未注册的 submodule、gitlink/child revision mismatch、跨越 symlink 的 nested root 与 escaping symlink。每个 submodule 作为独立 Component 按自己的 distribution 交换；父 Git bundle 不携带子仓库 objects。Embedded 拒绝 clean/smudge filter；reference/mirrored 可声明 `lfs_mode: pointer`，只交换 Git tree 中的 canonical LFS pointer，不执行 filter，也不承诺携带外部 LFS object。
+`git@v1` Production Export 拒绝 shallow repository、无法安全初始化或仍未注册的 submodule、gitlink/child revision mismatch、跨越 symlink 的 nested root 与 escaping symlink。每个 submodule 作为独立 Component 按自己的 distribution 交换；父 Git bundle 不携带子仓库 objects。Embedded 拒绝 clean/smudge filter；reference/mirrored 可声明 `lfs_mode: pointer`，只交换 Git tree 中的 canonical LFS pointer，不执行 filter，也不承诺携带外部 LFS object。
 
-Import 按父到子恢复：父 checkout 只能给 child 留下 absent 或 empty directory；非空、文件或 symlink collision 失败。Export 按子到父执行：父 Provider MUST 验证 selected gitlink 等于 child Component 的 locked revision。`lxp add` 注册已初始化 submodule；child 内路径进入 child index，child root selection 同步父 gitlink。递归 submodule 重复相同规则。
+Import 按父到子恢复：父 checkout 只能给 child 留下 absent 或 empty directory；非空、文件或 symlink collision 失败。Export 按子到父执行：父 Provider MUST 验证 selected gitlink 等于 child Component 的 locked revision。`lxp add` 对缺失 submodule 执行逐层 `git submodule update --init --checkout`，只 checkout 当前 gitlink 锁定 revision，再把 child 注册为独立 Component；已初始化 child 保持当前 revision，不隐式 fetch 或跟进 remote。Child 内路径进入 child index，child root selection 同步父 gitlink。递归 submodule 重复相同规则；unsafe symlink/non-empty collision 或初始化失败会使 Add 失败。
 
 ## Failure 与持久化保证
 
@@ -63,7 +63,7 @@ Import 按父到子恢复：父 checkout 只能给 child 留下 absent 或 empty
 
 ## 明确非目标
 
-本 Profile 不提供 remote Registry、coordinate install/resolve、Template repository import、branch/merge/rebase、多父历史、multi-writer Session、自动初始化或更新缺失 submodule、外部 Git LFS object exchange、Provider 自动安装、execution replay 或 hostile Artifact sandbox。
+本 Profile 不提供 remote Registry、coordinate install/resolve、Template repository import、branch/merge/rebase、多父历史、multi-writer Session、把 submodule 自动更新到 gitlink 之外的新 remote revision、外部 Git LFS object exchange、Provider 自动安装、execution replay 或 hostile Artifact sandbox。
 
 ## 发布门槛
 

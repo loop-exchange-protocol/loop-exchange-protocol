@@ -13,10 +13,12 @@
 The YAML uses placeholder digests and sizes to emphasize structure and omits large Git bundles. The real CLI generates the manifest, payloads, and lock automatically:
 
 ```bash
-git clone --recurse-submodules YOUR_REPOSITORY source
+git clone YOUR_REPOSITORY source
 lxp init .
 lxp add source
 lxp export --distribution embedded ../context.lxpz
 ```
 
-An uninitialized submodule, a gitlink without a nested Component, child-revision mismatch, symlink traversal, or a non-empty child target must fail.
+`lxp add` follows gitlinks from the parent index and initializes each child and deeper submodule one level at a time. It checks out only each locked commit and does not advance to a newer remote revision.
+
+A submodule that cannot be initialized safely, a gitlink without a nested Component, child-revision mismatch, symlink traversal, or a non-empty child target must fail.

@@ -23,7 +23,7 @@ make ci
 - Standalone embedded Artifact import 不依赖原始 source 或 exporter Engine state。
 - Secret 值不得进入 manifest、lock、payload、argv 或 log；Executable/MCP action 必须显式授权。
 - 未归属且未忽略的 path 会阻止 Export；Git-untracked 内容不得静默导出。
-- `git@v1` 把已初始化 submodule 注册为独立嵌套 Component；Export 子到父验证 gitlink/revision，Import 父到子恢复且拒绝 symlink/non-empty collision。
+- `git@v1` 在 `lxp add` 时按 gitlink 锁定 revision 自动初始化缺失 submodule，并递归注册为独立嵌套 Component；不得把已初始化 submodule 更新到远端新 revision。Export 子到父验证 gitlink/revision，Import 父到子恢复且拒绝 symlink/non-empty collision。
 - Conversation 可以 continue，但不支持 execution replay。
 
 `v1alpha1` 是不承诺兼容性的 public alpha，只面向可信 Artifact。Validation、digest verification 与 execution policy 不是处理恶意输入的完整安全边界。

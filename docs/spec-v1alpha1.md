@@ -62,7 +62,7 @@ components:
 - Engine 只拥有 root、identity、Provider routing、Requirements 与交换 envelope。
 - 除已声明的 direct child roots 外，Component 内部对 Core MUST opaque。实体 path 由包含它的最深 Component root 唯一拥有；祖先 Provider MUST 排除所有 direct child subtrees，无法安全排除时 MUST 失败。
 - Core MUST NOT 规定 symlink、copy、mount 或 Provider 组合矩阵，也不得把本地物化能力写入 Artifact。父子物理组合由本地 Provider 判断；不兼容 MUST fail closed。
-- Core MAY 在 Add 时调用 owning Provider 的 native child discovery。发现的 child 必须注册为独立 Component；未知 marker 不得被 Core 猜测。
+- Core MAY 在 Add 时调用 owning Provider 的 native child discovery。Provider MAY 按 contract 执行使明确 direct child root 可独立匹配所需的 bounded preparation；该行为必须由 contract 公开，且 unsafe collision 或 preparation failure 必须在注册前失败。发现的 child 必须注册为独立 Component；未知 marker 不得被 Core 猜测。
 - 普通 path 操作 MUST 路由给最深 owning Provider。“从哪里来就到哪里去，原来谁管就交回谁管”。父 Provider 可另外维护 gitlink 等只属于边界的 native attachment metadata，但不得读取或导出 child 实体内容。
 
 ## 4. Provider contract
@@ -77,7 +77,7 @@ Provider contract 包含：
 - `Plan`：在执行前暴露 Requirements、动作与安全影响；
 - `Add`：选择 Provider-native 变更；
 - `Status`：返回 Provider-native tracked/untracked/ignored 状态；
-- `DiscoverChildren`（可选）：返回已初始化且可独立注册的 Provider-native direct child roots；
+- `DiscoverChildren`（可选）：按 contract 准备并返回可独立注册的 Provider-native direct child roots；
 - `TrackChild`（可选）：在 child selection 后同步父 Provider 的 boundary metadata；
 - `Activate`：在 Requirements 满足后执行 bounded activation；
 - `ExportComponent`：产生 immutable reference、embedded payload 或两者。
@@ -92,7 +92,7 @@ Core 向父 Provider 提供 direct child 的相对 root 与 portable identity。
 
 `lxp add PATH...` 必须遵循最长 ownership root 路由：
 
-1. PATH 位于最深已有 Component 内：优先调用 owning Provider 的 native child discovery；若没有更深的匹配 root，则调用该 Component Provider 的 `Add`。
+1. PATH 位于最深已有 Component 内：优先调用 owning Provider 的 native child discovery；contract-defined preparation 属于这次显式 Add，必须限制在明确 child boundary。若没有更深的匹配 root，则调用该 Component Provider 的 `Add`。
 2. PATH 是未归属 root，或 discovery 返回更深的明确 root：调用受信任 Provider 的 `Match`，注册唯一匹配 Provider 后再调用 `Add`。
 3. 无 Provider 匹配：失败；Core 不猜测或隐式安装 fallback Provider。
 4. 多 Provider 匹配：失败并要求调用者显式选择。

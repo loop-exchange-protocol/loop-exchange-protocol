@@ -25,9 +25,9 @@ The current Go Git Provider follows these rules:
 - `reference` and `mirrored` can express commit state only, so the Git index must match `HEAD`; use Production embedded for staged selection, or commit it first;
 - mirrored embedded content contains a base bundle only, never a staged-state patch;
 - reference Import retains its safe origin, and mirrored fallback retains the same origin identity;
-- partial/shallow repositories, uninitialized or unregistered submodules, gitlink/child-revision mismatch, escaping symlinks, and undeclared filters fail.
+- partial/shallow repositories, submodules that cannot be initialized safely or remain unregistered, gitlink/child-revision mismatch, escaping symlinks, and undeclared filters fail.
 
-A Git submodule is never restored implicitly from its parent bundle. Every initialized submodule is an independently distributed nested `git@v1` Component with its own locator, revision, and payload. The parent Provider retains only `.gitmodules` and the gitlink, and verifies that the selected gitlink equals the child locked revision. Import runs parent to child and Export child to parent. See [`examples/submodules/`](../examples/submodules/README.en.md) for complete YAML.
+A Git submodule is never restored implicitly from its parent bundle. `lxp add` initializes a missing submodule at its gitlink-locked revision and registers every submodule as an independently distributed nested `git@v1` Component with its own locator, revision, and payload. The parent Provider retains only `.gitmodules` and the gitlink, and verifies that the selected gitlink equals the child locked revision. Import runs parent to child and Export child to parent. See [`examples/submodules/`](../examples/submodules/README.en.md) for complete YAML.
 
 Spring AI uses Git LFS. A reference or mirrored Component can declare:
 

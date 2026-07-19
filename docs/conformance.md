@@ -13,7 +13,7 @@
 | `provider-CONTRACT` | Match、Plan、Resolve、Materialize/Restore、Add/Status、ExportComponent 和支持的 distribution | Provider contract suite；未知 contract 与不支持 distribution 失败；Provider config/payload 对 Core 不透明 |
 | `requirements-core` | Plan/checklist、依赖 DAG、显式 executable/MCP policy、credential handle 隔离 | missing/ambiguous/cyclic Requirement；未授权 execution；secret 不进入文件、lock、payload、argv 或 log |
 | `standalone-portability` | 删除 exporter state 与原始 source 后从 embedded Artifact 恢复并继续下一代 | destructive 两代 Export/Import Harness；Provider-selected bytes/state 一致；仅对 contract 声明支持的 empty directory 与安全 symlink 验证 |
-| `production-git-v1` | 官方 CLI 只装配 `git@v1`；支持 reference/embedded/mirrored、递归 submodule Component、index selection、最小 HEAD bundle 与 parent 推进 | submodule 三种 distribution 往返；offline embedded/mirrored child 恢复；gitlink/child revision 强校验；拒绝未初始化/未注册 submodule、secret/local locator、非法 staged index、shallow、escaping symlink 与额外 payload role；LFS pointer 模式不得执行 filter |
+| `production-git-v1` | 官方 CLI 只装配 `git@v1`；支持 reference/embedded/mirrored、递归 submodule Component、index selection、最小 HEAD bundle 与 parent 推进 | 普通 parent clone 后自动初始化 parent/child/grandchild；submodule 三种 distribution 往返；offline embedded/mirrored child 恢复；gitlink/child revision 强校验；拒绝不安全初始化/未注册 submodule、secret/local locator、非法 staged index、shallow、escaping symlink 与额外 payload role；LFS pointer 模式不得执行 filter |
 
 实现只能声明实际通过的 Profile。例如只实现 Artifact codec 的库不得声明 `tracking-core`；Provider 必须连同明确的 contract version 声明 `provider-CONTRACT`。Production MVP 发布必须声明前五个基础 Profile（其中 `provider-CONTRACT` 实例化为 `provider-git-v1`）与 `production-git-v1`；公开 CLI 必须端到端通过三种 distribution 的证据。
 

@@ -22,7 +22,7 @@ lxp import context.lxpz continued
 
 ## Add 与 Status
 
-未归属 path 首次 Add 时，Engine 从该 path 向上寻找 Git root；匹配 `source/.git` 后把整个 `source` 注册为一个 Component，再把相对 path 交给 `git add --`。Git Provider 同时读取 index 中的 gitlink，把每个已初始化 submodule 递归注册为嵌套 Git Component。普通 path 始终路由给最深 root；父仓库只维护 gitlink boundary。
+未归属 path 首次 Add 时，Engine 从该 path 向上寻找 Git root；匹配 `source/.git` 后把整个 `source` 注册为一个 Component，再把相对 path 交给 `git add --`。Git Provider 同时读取 index 中的 gitlink：缺失 submodule 会联系其 locator、checkout gitlink 锁定 commit，并逐层递归注册为嵌套 Git Component；已经初始化的 child 不会自动更新。普通 path 始终路由给最深 root；父仓库只维护 gitlink boundary。
 
 `status` 同时显示 Component roots、Git porcelain changes、未归属 paths 与 ignored paths。Git-untracked 内容属于 Git Provider 状态，不会被 Core 注册成另一个 Component，也不会被 Export 静默包含。未归属且未忽略的顶层 path 会阻塞 Export。
 
@@ -32,14 +32,16 @@ lxp import context.lxpz continued
 
 Embedded 使用当前 `HEAD` 的最小 Git bundle 加可选 staged binary patch，Import 不联系原 remote，并恢复 Git index selection。Reference 使用安全 network locator + 完整 commit ID。Mirrored 先尝试相同 revision 的 reference，source 不可用时清理部分 target，再从 embedded base 恢复。Reference/mirrored 要求 index 与 `HEAD` 一致，不能运输 staged patch。
 
-为保证 portable 语义，Git Provider 拒绝 shallow repository、未初始化/未注册 submodule、gitlink 与 child revision 不一致、cross-symlink nested root 和 escaping symlink；embedded 还拒绝 clean/smudge filter。Submodule 是独立 Component，父 bundle 不包含子 objects；Import 父到子恢复，Export 子到父验证。Reference/mirrored 的 LFS pointer 模式不执行 filter，外部 LFS object 不进入 Artifact。Artifact output 不覆盖现有路径；Import target 必须不存在，失败时清理新 target。
+为保证 portable 语义，Git Provider 拒绝 shallow repository、无法安全初始化或未注册的 submodule、gitlink 与 child revision 不一致、cross-symlink nested root 和 escaping symlink；embedded 还拒绝 clean/smudge filter。Submodule 是独立 Component，父 bundle 不包含子 objects；Import 父到子恢复，Export 子到父验证。Reference/mirrored 的 LFS pointer 模式不执行 filter，外部 LFS object 不进入 Artifact。Artifact output 不覆盖现有路径；Import target 必须不存在，失败时清理新 target。
 
-已有 submodule 的最短路径是先按 Git 原生方式初始化，再一次 Add 父 root：
+已有 submodule 的最短路径是普通 clone 后一次 Add 父 root；`git@v1` 会自动初始化递归 submodule：
 
 ```bash
-git clone --recurse-submodules YOUR_REPOSITORY source
+git clone YOUR_REPOSITORY source
 lxp add source
 ```
+
+自动初始化只 checkout 每个 gitlink 当前锁定的 commit，不等同于 `git submodule update --remote`。Symlink/non-empty target collision、不可访问 locator 或 checkout 失败都会使 Add 失败。
 
 修改子仓库后，`lxp add source/PATH/IN/SUBMODULE` 选择 child index；子仓库产生新 commit 后，`lxp add source/PATH/TO/SUBMODULE` 同时让 child Provider 处理 root 并同步父 index 的 gitlink。
 

@@ -23,7 +23,7 @@ make ci
 - A standalone embedded Artifact imports without original sources or exporter Engine state.
 - Secrets never enter manifests, locks, payloads, argv, or logs. Executable and MCP actions require explicit authorization.
 - Unowned, non-ignored paths block Export. Git-untracked content is never exported silently.
-- `git@v1` registers each initialized submodule as an independent nested Component. Export validates gitlink/revision from child to parent; Import restores parent to child and rejects symlink/non-empty collisions.
+- During `lxp add`, `git@v1` initializes each missing submodule at its gitlink-locked revision and recursively registers it as an independent nested Component; it never advances an initialized submodule to a newer remote revision. Export validates gitlink/revision from child to parent; Import restores parent to child and rejects symlink/non-empty collisions.
 - Conversations may continue; execution replay is unsupported.
 
 `v1alpha1` is a public alpha with no compatibility promise and is limited to trusted Artifacts. Validation, digest verification, and execution policy are not a complete security boundary for hostile input.

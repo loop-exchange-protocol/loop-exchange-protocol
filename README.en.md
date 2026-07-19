@@ -30,7 +30,7 @@ The analogy stops at usage. The protocol permits different Provider types; the f
 
 1. **LXP tracks ownership; Providers track content.** A Component is opaque to Core except for its direct child boundaries.
 2. Component roots are unique and may form a strictly nested lexical tree. Every entity path belongs only to its deepest root; ancestor Providers exclude child subtrees.
-3. `lxp add` normally invokes the deepest owning Provider. Native Provider discovery may register explicit child roots such as initialized submodules as nested Components.
+3. `lxp add` normally invokes the deepest owning Provider. Native Provider discovery may perform contract-defined preparation and register explicit child roots as nested Components. `git@v1` initializes a missing submodule at its gitlink-locked revision.
 4. A Provider is identified by stable `provider + contract`; Provider-specific `config` is opaque to Core.
 5. The protocol defines no mount-capability or Provider-pair matrix. A Provider fails closed when a concrete parent/child path cannot be composed physically.
 6. Artifacts never carry executable Provider code. Import requires a preinstalled, trusted matching Provider contract and otherwise fails.
@@ -62,7 +62,7 @@ cd ..
 lxp import review-loop.lxpz continued
 ```
 
-Within a Git Component, `lxp add` invokes the native Git index. Every initialized submodule becomes a nested Git Component, and Export strictly verifies its parent gitlink against the child locked revision. An unowned path with no matching Provider fails. `lxp import` validates the Artifact, displays Provider actions, and checks Requirements before any side effect.
+Within a Git Component, `lxp add` invokes the native Git index. A missing submodule is initialized at its gitlink-locked revision and recursively becomes a nested Git Component, but is never advanced automatically to a newer remote revision. Export strictly verifies its parent gitlink against the child locked revision. An unowned path with no matching Provider fails. `lxp import` validates the Artifact, displays Provider actions, and checks Requirements before any side effect.
 
 ## Documentation
 

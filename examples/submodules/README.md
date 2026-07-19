@@ -13,10 +13,12 @@
 YAML 使用占位 digest/size 来突出结构，不附带大型 Git bundle。真实 CLI 会自动生成 manifest、payload 与 lock：
 
 ```bash
-git clone --recurse-submodules YOUR_REPOSITORY source
+git clone YOUR_REPOSITORY source
 lxp init .
 lxp add source
 lxp export --distribution embedded ../context.lxpz
 ```
 
-未初始化 submodule、没有对应 nested Component 的 gitlink、child revision mismatch、穿越 symlink 或非空 child target 都必须失败。
+`lxp add` 会从 parent index 的 gitlink 逐层初始化 child 与更深 submodule，只 checkout 各自锁定 commit，不跟进 remote 新 revision。
+
+无法安全初始化的 submodule、没有对应 nested Component 的 gitlink、child revision mismatch、穿越 symlink 或非空 child target 都必须失败。

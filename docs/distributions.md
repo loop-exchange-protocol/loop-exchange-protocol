@@ -25,9 +25,9 @@
 - `reference` 与 `mirrored` 只能表达 commit state，因此 Git index 必须与 `HEAD` 一致；存在 staged selection 时使用 Production embedded，或先 commit；
 - `mirrored` embedded 只包含 base bundle，不带 staged state patch；
 - reference Import 保留安全 origin；mirrored fallback 恢复后也保留同一 origin identity；
-- partial/shallow repository、未初始化或未注册 submodule、gitlink/child revision mismatch、escaping symlink 与未声明 filter 失败。
+- partial/shallow repository、无法安全初始化或未注册的 submodule、gitlink/child revision mismatch、escaping symlink 与未声明 filter 失败。
 
-Git submodule 不从父 bundle 隐式恢复。每个已初始化 submodule 是 path 嵌套的独立 `git@v1` Component，拥有自己的 locator/revision/payload；父 Provider 只保留 `.gitmodules` 与 gitlink，并验证 selected gitlink 等于 child locked revision。Import 父到子执行，Export 子到父执行。完整 YAML 见 [`examples/submodules/`](../examples/submodules/README.md)。
+Git submodule 不从父 bundle 隐式恢复。`lxp add` 会按 gitlink 锁定 revision 自动初始化缺失 submodule，并把每个 submodule 注册为 path 嵌套的独立 `git@v1` Component，使其拥有自己的 locator/revision/payload；父 Provider 只保留 `.gitmodules` 与 gitlink，并验证 selected gitlink 等于 child locked revision。Import 父到子执行，Export 子到父执行。完整 YAML 见 [`examples/submodules/`](../examples/submodules/README.md)。
 
 Spring AI 使用 Git LFS。Reference/mirrored Component 可以声明：
 

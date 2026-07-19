@@ -22,7 +22,7 @@ lxp import context.lxpz continued
 
 ## Add and Status
 
-On first Add of an unowned path, Engine searches upward for a Git root. After matching `source/.git`, it registers all of `source` as one Component and passes the relative path to `git add --`. The Git Provider also reads gitlinks from the index and recursively registers every initialized submodule as a nested Git Component. Ordinary paths route to the deepest root; the parent repository maintains only the gitlink boundary.
+On first Add of an unowned path, Engine searches upward for a Git root. After matching `source/.git`, it registers all of `source` as one Component and passes the relative path to `git add --`. The Git Provider also reads gitlinks from the index: a missing submodule contacts its locator, checks out the gitlink-locked commit, and is recursively registered one level at a time as a nested Git Component; an initialized child is not updated automatically. Ordinary paths route to the deepest root; the parent repository maintains only the gitlink boundary.
 
 Status shows Component roots, Git porcelain changes, unowned paths, and ignored paths. Git-untracked content is Provider state: Core does not register another Component for it, and Export never includes it silently. An unowned, non-ignored top-level path blocks Export.
 
@@ -32,14 +32,16 @@ Status shows Component roots, Git porcelain changes, unowned paths, and ignored 
 
 Embedded uses a minimal Git bundle for the current `HEAD` plus an optional staged binary patch; Import does not contact the original remote and restores Git index selection. Reference uses a safe network locator plus full commit ID. Mirrored tries the same-revision reference first, cleans any partial target when its source is unavailable, and restores the embedded base. Reference and mirrored require an index matching `HEAD` and cannot transport a staged patch.
 
-For portable behavior, the Git Provider rejects shallow repositories, uninitialized or unregistered submodules, gitlink/child-revision mismatch, cross-symlink nested roots, and escaping symlinks; embedded also rejects clean/smudge filters. A submodule is an independent Component and the parent bundle contains no child objects; Import restores parent to child and Export validates child to parent. Reference/mirrored LFS pointer mode never executes filters, and external LFS objects do not enter the Artifact. Artifact output never overwrites an existing path; an Import target must not exist and a failed Import removes the new target.
+For portable behavior, the Git Provider rejects shallow repositories, submodules that cannot be initialized safely or remain unregistered, gitlink/child-revision mismatch, cross-symlink nested roots, and escaping symlinks; embedded also rejects clean/smudge filters. A submodule is an independent Component and the parent bundle contains no child objects; Import restores parent to child and Export validates child to parent. Reference/mirrored LFS pointer mode never executes filters, and external LFS objects do not enter the Artifact. Artifact output never overwrites an existing path; an Import target must not exist and a failed Import removes the new target.
 
-For an existing submodule, initialize it with native Git and Add the parent root once:
+For an existing submodule, use a plain clone and Add the parent root once; `git@v1` initializes recursive submodules automatically:
 
 ```bash
-git clone --recurse-submodules YOUR_REPOSITORY source
+git clone YOUR_REPOSITORY source
 lxp add source
 ```
+
+Automatic initialization checks out only the commit currently locked by each gitlink; it is not `git submodule update --remote`. A symlink/non-empty target collision, unavailable locator, or failed checkout fails Add.
 
 After changing a child repository, `lxp add source/PATH/IN/SUBMODULE` selects the child index. After the child produces a new commit, `lxp add source/PATH/TO/SUBMODULE` lets the child Provider process its root and synchronizes the parent index gitlink.
 

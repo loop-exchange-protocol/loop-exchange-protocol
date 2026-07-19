@@ -62,14 +62,14 @@ Normative invariants:
 - Engine owns roots, identities, Provider routing, Requirements, and the exchange envelope.
 - Except for declared direct child roots, a Component remains opaque to Core. Every entity path is owned by its deepest containing Component root. An ancestor Provider MUST exclude every direct child subtree and MUST fail when it cannot do so safely.
 - Core MUST NOT standardize symlink, copy, mount, or Provider-pair compatibility, and local materialization capabilities MUST NOT enter the Artifact. Local Providers decide whether a parent and child can be composed physically and fail closed when they cannot.
-- During Add, Core MAY invoke native child discovery on the owning Provider. A discovered child is registered as an independent Component; Core cannot guess unknown markers.
+- During Add, Core MAY invoke native child discovery on the owning Provider. A Provider MAY perform contract-defined bounded preparation required to make an explicit direct child root independently matchable; the contract must disclose that behavior, and an unsafe collision or preparation failure must fail before registration. A discovered child is registered as an independent Component; Core cannot guess unknown markers.
 - Ordinary path operations route to the deepest owning Provider. A parent Provider may additionally maintain Provider-native attachment metadata such as a gitlink at the boundary, but cannot read or export child entity content.
 
 ## 4. Provider contract
 
 Provider identity consists of a stable `provider` ID and `contract` version. Provider-specific `config` is opaque: Core MUST transport it faithfully and MUST NOT interpret its fields. Payload roles are likewise contract-defined.
 
-A Provider contract contains `Match`, `Resolve`, `Materialize`, `Restore`, `Plan`, `Add`, `Status`, `Activate`, and `ExportComponent`. It MAY implement `DiscoverChildren` for initialized Provider-native direct child roots and `TrackChild` for parent boundary metadata after child selection. Plan exposes Requirements, actions, and security effects before execution. Add and Status implement native change-selection semantics.
+A Provider contract contains `Match`, `Resolve`, `Materialize`, `Restore`, `Plan`, `Add`, `Status`, `Activate`, and `ExportComponent`. It MAY implement `DiscoverChildren` to prepare and return independently registrable Provider-native direct child roots, and `TrackChild` for parent boundary metadata after child selection. Plan exposes Requirements, actions, and security effects before execution. Add and Status implement native change-selection semantics.
 
 Artifacts MUST NOT carry Provider executables, plugin binaries, or install hooks. Import MUST use a preinstalled, trusted, exactly matching contract and otherwise fail. Silent downgrade and Agent-inferred migration are forbidden.
 
@@ -81,7 +81,7 @@ Core supplies a parent Provider with the relative roots and portable identities 
 
 `lxp add PATH...` follows ownership routing:
 
-1. Inside the deepest existing Component, first invoke its Provider's native child discovery. If no deeper root matches, invoke that Component Provider's `Add`.
+1. Inside the deepest existing Component, first invoke its Provider's native child discovery. Contract-defined preparation belongs to this explicit Add and is limited to explicit child boundaries. If no deeper root matches, invoke that Component Provider's `Add`.
 2. At an unowned root, or at a deeper root returned by discovery, invoke trusted Providers' `Match`, register the unique match, then invoke `Add`.
 3. With no match, fail; Core never guesses or implicitly installs a fallback Provider.
 4. Multiple matches fail and require explicit selection.
