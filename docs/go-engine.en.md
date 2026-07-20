@@ -63,7 +63,7 @@ Use the embedded default for ordinary checkpoints, reference for large public re
 
 ## Extension config, Requirements, and trust boundary
 
-Providers and Checkers use `namespace:name:version`. `LXP_CONFIG` may select a local EngineConfig; otherwise the CLI reads `lxp/config.yaml` from the user config directory and falls back to official builtin bindings. Repositories, implementation versions, and digests never enter an Artifact. The current CLI does not auto-install repository extensions.
+Providers and Checkers use `namespace:name:version`. `LXP_CONFIG` may select a local EngineConfig; otherwise the CLI reads `lxp/config.yaml` from the user config directory and falls back to official builtin bindings. Config may select local `source: helper` argv or install by digest from an explicitly authorized OCI repository. A Helper performs a newline-delimited JSON handshake and exits at command end. Repositories, commands, implementation versions, and digests never enter an Artifact. See the [extension protocol](extensions.en.md).
 
 `lxp requirements` does not Apply the Artifact. It checks executable, MCP, and credential contracts through global Checker coordinates, and its TUI persists only a local non-secret policy profile. Executable and MCP probes require explicit authorization. Credentials persist local binding names only; values never enter Artifacts, local state, argv, or logs.
 

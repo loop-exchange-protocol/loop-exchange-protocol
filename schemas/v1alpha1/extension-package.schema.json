@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loop.exchange/schemas/v1alpha1/extension-package.schema.json",
+  "title": "Loop Exchange Extension Package Descriptor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "extension_kind", "contract", "implementation", "protocol", "os", "architecture", "entrypoint"],
+  "properties": {
+    "api_version": { "const": "loop.exchange/v1alpha1" },
+    "kind": { "const": "ExtensionPackage" },
+    "extension_kind": { "enum": ["provider", "checker"] },
+    "contract": { "$ref": "#/$defs/contract" },
+    "implementation": { "$ref": "#/$defs/contract" },
+    "protocol": { "const": "loop.exchange/helper-v1" },
+    "os": { "$ref": "#/$defs/identifier" },
+    "architecture": { "$ref": "#/$defs/identifier" },
+    "entrypoint": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "arguments": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  },
+  "$defs": {
+    "identifier": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "namespace": { "type": "string", "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$" },
+    "contract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["namespace", "name", "version"],
+      "properties": {
+        "namespace": { "$ref": "#/$defs/namespace" },
+        "name": { "$ref": "#/$defs/identifier" },
+        "version": { "$ref": "#/$defs/identifier" }
+      }
+    }
+  }
+}

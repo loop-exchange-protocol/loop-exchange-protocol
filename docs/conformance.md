@@ -13,9 +13,10 @@
 | `provider-CONTRACT` | Contract/Implementation、Match、Validate、幂等/可重试 Apply、Add/Status、ExportComponent 与 distribution | 精确全局 contract 与 implementation package；未知/未绑定/mismatch/重复注册失败；重复 Apply 等价；不推进 revision、不删除 child/unowned content；deadline 与 non-interactive credential |
 | `requirements-core` | 全局 Checker contract、本地 binding、只读 Check、显式 executable/MCP policy、credential handle 隔离 | 未知/未绑定 Checker 与 consumed failure；未授权 execution；secret 不进入配置、state、payload、argv 或 log；无 install/Activate |
 | `standalone-portability` | 删除 exporter state 与原始 source 后从 embedded Artifact 恢复并继续下一代 | destructive 两代 Export/Import Harness；Provider-selected bytes/state 一致；仅对 contract 声明支持的 empty directory 与安全 symlink 验证 |
-| `production-git-v1` | 官方 CLI 只装配 `loop.exchange:git:v1` builtin；三种 distribution、递归 submodule、index selection 与最小 HEAD bundle | parent/child/grandchild 初始化；父 Apply 重试保留 child；config-only init 不访问网络；offline embedded/mirrored；gitlink 强校验；256 MiB 双向上限；拒绝不安全 submodule、secret/local locator、shallow、escaping symlink、filter 与额外 payload role |
+| `extension-helper-v1` | builtin/helper/repository binding、OCI digest 与 platform package、精确进程握手、命令级生命周期、本地 trust | Helper Provider/Checker 往返；未知 source、identity/capability/protocol mismatch 失败；未授权 namespace 不下载；OCI manifest/config/layer 正反向测试；cache 离线复用与损坏修复；取消、deadline、有界消息/诊断；无 shell 与 Artifact 授权 |
+| `production-git-v1` | 官方 CLI 默认装配 `loop.exchange:git:v1` builtin，并验证等价独立 Helper；三种 distribution、递归 submodule、index selection 与最小 HEAD bundle | builtin/Helper 往返；精确握手；parent/child/grandchild 初始化；父 Apply 重试保留 child；config-only init 不访问网络；offline embedded/mirrored；gitlink 强校验；256 MiB 双向上限；拒绝不安全 submodule、secret/local locator、shallow、escaping symlink、filter 与额外 payload role |
 
-实现只能声明实际通过的 Profile。例如只实现 Artifact codec 的库不得声明 `tracking-core`；Provider 必须连同明确的 contract version 声明 `provider-CONTRACT`。Production MVP 发布必须声明前五个基础 Profile（其中 `provider-CONTRACT` 实例化为 `provider-git-v1`）与 `production-git-v1`；公开 CLI 必须端到端通过三种 distribution 的证据。
+实现只能声明实际通过的 Profile。例如只实现 Artifact codec 的库不得声明 `tracking-core`；Provider 必须连同明确的 contract version 声明 `provider-CONTRACT`。Production MVP 发布必须声明前六个基础 Profile（其中 `provider-CONTRACT` 实例化为 `provider-git-v1`）与 `production-git-v1`；公开 CLI 必须端到端通过三种 distribution 的证据。
 
 ## Canonical vectors
 

@@ -59,4 +59,4 @@ Credential 配置只声明接受的 scheme 与 secret slot 名称。值只能通
 
 ## 扩展解析
 
-Artifact 声明 Checker contract；本机 EngineConfig 把它绑定到 implementation package。仓库、镜像、实现版本、digest 与 credential 都由消费端 policy 控制。官方 CLI 只执行编入二进制的 Go Checker；v1alpha1 不要求自动安装或多语言 SDK。
+Artifact 声明 Checker contract；本机 EngineConfig 把它绑定到 builtin、本地 Helper 或经授权 OCI repository 的 implementation package。仓库、镜像、实现版本、digest、command 与 credential 都由消费端 policy 控制。Helper 使用 language-neutral 进程协议，但 v1alpha1 不承诺多语言 SDK；官方 credential/executable/MCP Checker 默认保持 builtin，secret value 不通过 Helper wire 传递。

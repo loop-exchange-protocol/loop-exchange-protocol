@@ -21,7 +21,7 @@ loop-exchange-protocol/
 
 ### lxp
 
-官方参考实现，当前使用 Go，包含类型、Provider/Checker 接口、Engine、Artifact codec 与 `cmd/lxp`。仓库不再叫 `go-sdk`，因为项目没有维护 Java/Rust/Python SDK 系列的承诺，而且该仓库不只是 SDK。
+官方参考实现，当前使用 Go，包含类型、Provider/Checker 接口、Engine、Artifact codec 与 `cmd/lxp`。仓库名不含语言前缀：项目没有维护 Java/Rust/Python SDK 系列的承诺，而且该仓库不只是 SDK。
 
 ### provider-git
 
@@ -31,6 +31,6 @@ loop-exchange-protocol/
 
 ## 扩展分发与贡献归属
 
-第三方 Provider/Checker 以全局 `namespace:name:version` contract 标识，并按独立领域仓库维护 credit、发布周期与安全责任。Artifact 只声明 contract；消费端 EngineConfig 配置仓库和 contract→implementation binding。官方 CLI 暂时只执行 builtin，不自动安装 repository package。
+第三方 Provider/Checker 以全局 `namespace:name:version` contract 标识，并按独立领域仓库维护 credit、发布周期与安全责任。Artifact 只声明 contract；消费端 EngineConfig 配置 builtin、本地 Helper 或 OCI contract→implementation binding。LXP 不建立中心 Registry：分发复用 OCI/GHCR，激活使用 Helper 子进程；只有本地显式 `auto_install` 与 namespace allowlist 可以下载，Artifact 不能授权。
 
 案例保留在本规范仓库，与 Schema 同步；可执行 Harness 位于实现仓库。第三方实现只有通过适用 Conformance Profile 才能声明兼容。`v1alpha1` 不承诺兼容性，当前只面向可信 Artifact。

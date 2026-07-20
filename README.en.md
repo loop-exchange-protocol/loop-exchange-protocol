@@ -35,7 +35,7 @@ objects/sha256/<hex>
 
 There is no `lock.yaml`, and unknown files or orphan objects not referenced by the manifest are rejected. The manifest already fixes revisions, distributions, and payload digests. Artifact identity is the SHA-256 of validated raw `manifest.yaml` bytes; no YAML canonicalization is performed.
 
-Providers and Checkers use `namespace:name:version` contract coordinates that are globally unique across kinds, such as `loop.exchange:git:v1`. An Artifact declares contracts only and carries no implementation package, repository URL, executable, or installation hook. Local [EngineConfig](examples/config/README.en.md) defines ordered repositories and contract-to-implementation bindings and exactly verifies registered implementations. The official CLI executes builtin Go implementations only and does not auto-install repository extensions.
+Providers and Checkers use `namespace:name:version` contract coordinates that are globally unique across kinds, such as `loop.exchange:git:v1`. An Artifact declares contracts only and carries no implementation package, repository URL, executable, or installation hook. Local [EngineConfig](examples/config/README.en.md) binds a builtin, local Helper argv, or a Helper installed by digest from an explicitly authorized OCI repository; the process uses an exact, language-neutral [Helper protocol](docs/extensions.en.md) handshake. The official CLI retains a builtin Git Provider by default and also supplies an independent Git Helper. An Artifact cannot authorize download or execution.
 
 The protocol is language-neutral, but the project maintains one official Go reference implementation and promises no multi-language SDK matrix:
 
@@ -83,6 +83,8 @@ lxp import review-loop.lxpz continued
 - [EngineConfig YAML](examples/config/README.en.md) · [中文](examples/config/README.md)
 - [ContextArtifact Schema](schemas/v1alpha1/context-artifact.schema.json)
 - [EngineConfig Schema](schemas/v1alpha1/engine-config.schema.json)
+- [Extension Package Schema](schemas/v1alpha1/extension-package.schema.json)
+- [Helper Message Schema](schemas/v1alpha1/helper-message.schema.json)
 - [HTML overview](dist/import-export-protocol.html)
 
 ## Alpha and security boundary

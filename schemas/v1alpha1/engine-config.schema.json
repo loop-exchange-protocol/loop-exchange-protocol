@@ -38,21 +38,37 @@
       "required": ["id", "url"],
       "properties": {
         "id": { "$ref": "#/$defs/identifier" },
-        "url": { "type": "string", "format": "uri", "minLength": 1 },
-        "credential": { "$ref": "#/$defs/identifier" }
-      }
+        "url": { "type": "string", "format": "uri", "pattern": "^(?:oci|https)://", "minLength": 1 },
+        "credential": { "$ref": "#/$defs/identifier" },
+        "auto_install": { "type": "boolean", "default": false },
+        "trusted_namespaces": {
+          "type": "array", "uniqueItems": true,
+          "items": { "$ref": "#/$defs/namespace" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "auto_install": { "const": true } }, "required": ["auto_install"] },
+          "then": { "required": ["trusted_namespaces"], "properties": { "trusted_namespaces": { "minItems": 1 } } }
+        }
+      ]
     },
     "implementation": {
       "type": "object", "additionalProperties": false,
       "required": ["source", "package"],
       "properties": {
-        "source": { "enum": ["builtin", "repository"] },
+        "source": { "enum": ["builtin", "helper", "repository"] },
         "package": { "$ref": "#/$defs/package" },
-        "digest": { "$ref": "#/$defs/digest" }
+        "digest": { "$ref": "#/$defs/digest" },
+        "command": {
+          "type": "array", "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
       },
       "allOf": [
-        { "if": { "properties": { "source": { "const": "builtin" } } }, "then": { "not": { "required": ["digest"] } } },
-        { "if": { "properties": { "source": { "const": "repository" } } }, "then": { "required": ["digest"] } }
+        { "if": { "properties": { "source": { "const": "builtin" } }, "required": ["source"] }, "then": { "not": { "anyOf": [{ "required": ["digest"] }, { "required": ["command"] }] } } },
+        { "if": { "properties": { "source": { "const": "helper" } }, "required": ["source"] }, "then": { "required": ["command"], "not": { "required": ["digest"] } } },
+        { "if": { "properties": { "source": { "const": "repository" } }, "required": ["source"] }, "then": { "required": ["digest"], "not": { "required": ["command"] } } }
       ]
     },
     "binding": {

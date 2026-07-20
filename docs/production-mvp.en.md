@@ -22,14 +22,14 @@ lxp inspect ARTIFACT.lxpz
 lxp requirements [--format tui|json] ARTIFACT.lxpz
 ```
 
-Before any Component write, Import validates the complete Artifact, resolves every extension, checks consumed Requirements, and calls every Provider `Validate`; it then calls `Apply` parent-to-child. There is no public or internal Plan command, install, build, Activate, or Core rollback stage.
+Before any Component write, Import validates the complete Artifact, resolves every extension under local policy, checks consumed Requirements, and calls every Provider `Validate`; it then calls `Apply` parent-to-child. Helper download and handshake are extension resolution. There is no Artifact-driven install/build, separate Activate, Plan command, or Core rollback stage.
 
 ## Official implementation and extensions
 
 - The official reference implementation is [`lxp`](https://github.com/loop-exchange-protocol/lxp), written in Go and containing the SDK, Engine, and CLI. The project promises no additional language SDKs.
 - The only official content implementation is [`provider-git`](https://github.com/loop-exchange-protocol/provider-git), contract `loop.exchange:git:v1`. There is no File/Filesystem fallback.
 - Providers and Checkers use `namespace:name:version` coordinates that are globally unique across kinds and declare exact implementation packages. Artifacts declare contracts only; local EngineConfig supplies ordered repositories and implementation bindings, every operation verifies the registered implementation, and Import retry pins its initial resolution.
-- The official CLI executes only Go implementations declared as `source: builtin`. It parses repository config but does not automatically download or execute repository extensions. An Artifact can never override repository, mirror, trust, or installation policy.
+- The official CLI uses a builtin Git Provider by default and also provides an independent `lxp-provider-git` Helper as the first standard extension example. The Engine accepts local `helper` argv and can download a Helper by digest from an OCI repository with explicit `auto_install` and a namespace allowlist. An Artifact can never override repositories, mirrors, trust, commands, or installation policy.
 - The Git Provider requires a trusted preinstalled Git CLI. This is a host prerequisite, not an executable carried by an Artifact.
 
 ## Git ownership and selection
@@ -71,6 +71,6 @@ The parent owns only `.gitmodules` and the gitlink boundary and never exports ch
 
 ## Non-goals and release gate
 
-This Profile does not provide automatic repository-extension installation, Template import, branch/merge/rebase, multi-parent history, multi-writer coordination, automatic remote-revision advancement, external Git LFS object exchange, execution replay, or hostile-Artifact sandboxing.
+This Profile does not provide a central LXP Registry service, global plugin search, Artifact-driven installation, an in-process plugin ABI, Template import, branch/merge/rebase, multi-parent history, multi-writer coordination, automatic remote-revision advancement, external Git LFS object exchange, execution replay, or hostile-Artifact/Helper sandboxing.
 
 A release passes public Linux/macOS CI, Go unit/race/vet, Git Provider contract tests, all three distributions and recursive-submodule Harnesses, failed-Import retry and ready no-op, two-generation embedded round trips after exporter/source deletion, and digest/size/traversal/symlink/credential/cancellation/contract-mismatch tests. Bilingual docs, Schemas, YAML, SVG, HTML, and CLI help remain consistent.

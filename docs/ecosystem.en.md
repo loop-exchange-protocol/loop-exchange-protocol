@@ -21,7 +21,7 @@ The sole language-neutral source for JSON Schemas, bilingual documentation, cano
 
 ### lxp
 
-The official reference implementation, currently written in Go. It contains types, Provider/Checker interfaces, Engine, Artifact codec, and `cmd/lxp`. It is no longer called `go-sdk`: the project promises no Java/Rust/Python SDK family, and this repository is more than an SDK.
+The official reference implementation, currently written in Go. It contains types, Provider/Checker interfaces, Engine, Artifact codec, and `cmd/lxp`. Its name has no language prefix: the project promises no Java/Rust/Python SDK family, and this repository is more than an SDK.
 
 ### provider-git
 
@@ -31,6 +31,6 @@ The old `go-provider-local` repository is archived. File/Filesystem Providers ar
 
 ## Extension distribution and credit
 
-A third-party Provider or Checker uses a global `namespace:name:version` contract and keeps credit, release cadence, and security responsibility in a domain-specific repository. An Artifact declares only contracts; consumer EngineConfig supplies repositories and contract-to-implementation bindings. The official CLI currently executes builtins only and does not auto-install repository packages.
+A third-party Provider or Checker uses a global `namespace:name:version` contract and keeps credit, release cadence, and security responsibility in a domain-specific repository. An Artifact declares only contracts; consumer EngineConfig binds a builtin, local Helper, or OCI implementation. LXP creates no central Registry: distribution reuses OCI/GHCR and activation uses Helper subprocesses. Download requires explicit local `auto_install` and a namespace allowlist; an Artifact cannot authorize it.
 
 Examples remain in the specification repository alongside their Schemas. Executable Harnesses live with implementations. A third-party implementation claims compatibility only after passing an applicable Conformance Profile. `v1alpha1` has no compatibility promise and is limited to trusted Artifacts.

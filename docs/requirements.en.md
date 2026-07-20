@@ -59,4 +59,4 @@ Credential config declares accepted schemes and secret-slot names only. Values t
 
 ## Extension resolution
 
-An Artifact declares a Checker contract. Local EngineConfig binds it to an implementation package. Repositories, mirrors, implementation versions, digests, and credentials remain under consumer policy. The official CLI executes only Go Checkers compiled into the binary; v1alpha1 requires neither automatic installation nor a multi-language SDK matrix.
+An Artifact declares a Checker contract. Local EngineConfig binds it to a builtin, local Helper, or implementation package from an authorized OCI repository. Repositories, mirrors, implementation versions, digests, commands, and credentials remain consumer policy. Helpers use a language-neutral process protocol, but v1alpha1 promises no multi-language SDK matrix. Official credential/executable/MCP Checkers remain builtin by default, and secret values do not cross the Helper wire.

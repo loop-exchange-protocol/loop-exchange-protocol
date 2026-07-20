@@ -35,7 +35,7 @@ objects/sha256/<hex>
 
 没有 `lock.yaml`，也不接受未知文件或未被 manifest 引用的孤儿 object。Manifest 已固定 revision、distribution 与 payload digest；Artifact identity 是验证通过的 `manifest.yaml` 原始 bytes 的 SHA-256，不执行 YAML canonicalization。
 
-Provider 与 Checker 使用跨 kind 全局唯一的 `namespace:name:version` contract 坐标，例如 `loop.exchange:git:v1`。Artifact 只声明 contract，不携带实现包、仓库 URL、executable 或安装 hook。本地 [EngineConfig](examples/config/README.md) 配置有序仓库与 contract→implementation binding，并精确核验注册实现；官方 CLI 只执行 builtin Go 实现，不自动安装 repository extension。
+Provider 与 Checker 使用跨 kind 全局唯一的 `namespace:name:version` contract 坐标，例如 `loop.exchange:git:v1`。Artifact 只声明 contract，不携带实现包、仓库 URL、executable 或安装 hook。本地 [EngineConfig](examples/config/README.md) 可绑定 builtin、本地 Helper argv，或从显式授权的 OCI repository 按 digest 安装的 Helper；进程通过 language-neutral [Helper 协议](docs/extensions.md)精确握手。官方 CLI 默认内置 Git Provider，也提供独立 Git Helper；Artifact 不能授权下载或执行。
 
 协议保持语言无关，但项目只维护一套官方 Go 参考实现，不承诺多语言 SDK：
 
@@ -83,6 +83,8 @@ lxp import review-loop.lxpz continued
 - [EngineConfig YAML](examples/config/README.md) · [English](examples/config/README.en.md)
 - [ContextArtifact Schema](schemas/v1alpha1/context-artifact.schema.json)
 - [EngineConfig Schema](schemas/v1alpha1/engine-config.schema.json)
+- [Extension Package Schema](schemas/v1alpha1/extension-package.schema.json)
+- [Helper Message Schema](schemas/v1alpha1/helper-message.schema.json)
 - [HTML 协议概览](dist/import-export-protocol.html)
 
 ## Alpha 与安全边界

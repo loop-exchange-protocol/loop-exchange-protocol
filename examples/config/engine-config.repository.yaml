@@ -3,6 +3,7 @@ kind: EngineConfig
 repositories:
   - id: official
     url: oci://ghcr.io/loop-exchange-protocol
+    credential: GHCR_TOKEN
     auto_install: true
     trusted_namespaces:
       - loop.exchange
@@ -13,21 +14,9 @@ bindings:
       name: git
       version: v1
     implementation:
-      source: helper
+      source: repository
       package:
         namespace: loop.exchange
         name: provider-git
         version: 0.1.0-alpha.4
-      command:
-        - lxp-provider-git
-  - kind: checker
-    contract:
-      namespace: loop.exchange
-      name: executable
-      version: v1
-    implementation:
-      source: builtin
-      package:
-        namespace: loop.exchange
-        name: checker-executable
-        version: 0.1.0-alpha.4
+      digest: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa

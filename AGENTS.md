@@ -17,8 +17,8 @@ make ci
 - 生命周期为 `Import → Work → Add/Status → Export`；每次 Export 创建新的不可变 Artifact。
 - LXP 管 ownership，Provider 管内容；Component roots 唯一且可形成严格嵌套 lexical tree，实体 path 只归最深 root。
 - `lxp add` 路由到最深 owning Provider；native discovery 可注册嵌套 Component，祖先 Provider 必须排除 child subtree，无法安全组合时失败。
-- Provider 与 Checker 由跨 kind 全局唯一的 `namespace:name:version` contract 坐标标识；Artifact 只声明 contract，本地有序仓库与 binding 解析具体实现，并精确核验已注册 implementation package。
-- Artifact 不携带 Provider 可执行代码；未知或不匹配的 contract 必须失败。
+- Provider 与 Checker 由跨 kind 全局唯一的 `namespace:name:version` contract 坐标标识；Artifact 只声明 contract，本地有序仓库与 binding 解析具体实现，并精确核验 builtin registration 或 Helper handshake 的 implementation package。
+- Artifact 不携带 Provider 可执行代码；未知或不匹配的 contract 必须失败。Engine 可执行本地 Helper argv，或只从操作者显式启用且信任 namespace 的 OCI repository 按 digest 安装 Helper；必须精确握手、继承 deadline、限制诊断并在命令结束时关闭进程，Artifact 不能授权安装或执行。
 - 交换对象只包含逻辑身份与 SHA-256 payload，不包含本地物化路径或 Provider Store path。
 - Standalone embedded Artifact import 不依赖原始 source 或 exporter Engine state。
 - Artifact 只有 manifest 与被引用的 content-addressed payload；未知文件、孤儿 object 与冗余 `lock.yaml` 必须拒绝。Secret 值不得进入 manifest、payload、argv 或 log；Executable/MCP Check 必须显式授权。
@@ -31,4 +31,4 @@ make ci
 
 `v1alpha1` 是不承诺兼容性的 public alpha，只面向可信 Artifact。Validation、digest verification 与 execution policy 不是处理恶意输入的完整安全边界。
 
-Production MVP 是规范的受限子集：官方组合只包含内置 Go `loop.exchange:git:v1`，不承诺多语言 SDK；公开 CLI 只有 `init/add/status/export/import/inspect/requirements`，接受 `.lxpz` 的 `reference`、`embedded` 与 `mirrored`。`lxp export --distribution` 选择分发形式，默认 `embedded`；Import 按 Artifact 自动处理。自动安装扩展、File/Filesystem Provider 与 Template repository 不属于生产承诺。
+Production MVP 是规范的受限子集：官方默认组合包含内置 Go `loop.exchange:git:v1`，并提供独立 Git Helper 作为标准扩展样例，不承诺多语言 SDK；公开 CLI 只有 `init/add/status/export/import/inspect/requirements`，接受 `.lxpz` 的 `reference`、`embedded` 与 `mirrored`。`lxp export --distribution` 选择分发形式，默认 `embedded`；Import 按 Artifact 自动处理。Engine 支持本地 Helper 与显式授权的 OCI 自动安装，但不提供中心 Registry、全局搜索或 Artifact 驱动安装；File/Filesystem Provider 与 Template repository 不属于生产承诺。

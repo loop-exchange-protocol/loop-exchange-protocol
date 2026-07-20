@@ -25,7 +25,10 @@ VECTORS = {
         "examples/distributions/mirrored-manifest.yaml",
         "examples/submodules/manifest.yaml",
     ],
-    "schemas/v1alpha1/engine-config.schema.json": ["examples/config/engine-config.yaml"],
+    "schemas/v1alpha1/engine-config.schema.json": [
+        "examples/config/engine-config.yaml",
+        "examples/config/engine-config.repository.yaml",
+    ],
 }
 
 failed = False
